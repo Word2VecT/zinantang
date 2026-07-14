@@ -36,7 +36,7 @@ His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT
 <div class='paper-box'><div class='paper-box-image'><div><div class="badge">arXiv 2026</div><img src='images/CausalMix.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
-[Middo: Model-Informed Dynamic Data Optimization for Enhanced LLM Fine-Tuning via Closed-Loop Learning](https://arxiv.org/abs/2607.01104) \\
+[CausalMix: Data Mixture as Causal Inference for Language Model Training](https://arxiv.org/abs/2607.01104) \\
 **Zinan Tang**, **Yukun Zhang**, Shaomian Zheng, Zhuoshi Pan, Qizhi Pei, Dingnan Jin, Jun Zhou, Yujun Wang, Biqing Huang
 </div>
 </div>
