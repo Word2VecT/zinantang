@@ -17,7 +17,7 @@ redirect_from:
 
 <span class='anchor' id='about-me'></span>
 
-Zinan Tang (唐梓楠 in Chinese) is currently pursuing his master's degree in Electronic and Information Engineering (EIE) at the [Department of Automation (DA)](https://www.au.tsinghua.edu.cn), [Tsinghua University (THU)](https://www.tsinghua.edu.cn), under the supervision of [Dr. Biqing Huang](https://www.au.tsinghua.edu.cn/info/1075/3209.htm). He received his B.S. degree in Computer Science (CS) from the [School of Computer Science (Pilot Software Engineering School, SCS)](https://scs.bupt.edu.cn/) at [Beijing University of Posts and Telecommunication (BUPT)](https://www.bupt.edu.cn/). He currently is a Research Intern (RI) of [Ant Group](https://www.antgroup.com), participating in training data optimization for the [Ant Ling AI Model Family](https://www.ant-ling.com).
+Zinan Tang (唐梓楠 in Chinese) is currently pursuing his master's degree in Artificial Intelligence (AI) at the [Department of Automation (DA)](https://www.au.tsinghua.edu.cn), [Tsinghua University (THU)](https://www.tsinghua.edu.cn), under the supervision of [Dr. Biqing Huang](https://www.au.tsinghua.edu.cn/info/1075/3209.htm). He received his B.S. degree in Computer Science (CS) from the [School of Computer Science (Pilot Software Engineering School, SCS)](https://scs.bupt.edu.cn/) at [Beijing University of Posts and Telecommunication (BUPT)](https://www.bupt.edu.cn/). He currently is a Research Intern (RI) of [Ant Group](https://www.antgroup.com), participating in training data optimization for the [Ant Ling AI Model Family](https://www.ant-ling.com).
 
 His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT, post-training, pre-training, reasoning).
 
