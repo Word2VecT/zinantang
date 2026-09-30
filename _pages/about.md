@@ -23,21 +23,22 @@ His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT
 
 # 🔥 News
 
-- *2026.07*: 🔥🔥 [CausalMix](https://arxiv.org/abs/2607.01104) is released on arXiv!
-- *2026.04*: 🎉🎉 [REST](https://arXiv.org/abs/2507.10541) is accepted by ACL 2026 (Main). Congrats to Zhuoshi Pan!
-- *2025.12*: 🔥🔥 The [technical report](https://arXiv.org/abs/2512.14051) of [OpenDataArena](https://opendataarena.github.io/) is on arXiv!
-- *2025.09*: 🔥🔥 [ScaleDiff](https://arXiv.org/abs/2509.21070) is released on arXiv!
-- *2025.08*: 🎉🎉 [Middo](https://arXiv.org/abs/2508.21589) is accepted by EMNLP 2025 (Main). Thanks for all collaborators!
+- _2026.09_: 🎉🎉 [CausalMix](https://arxiv.org/abs/2607.01104) is accepted by NeurIPS 2026. Thanks for all collaborators!
+- _2026.07_: 🔥🔥 [CausalMix](https://arxiv.org/abs/2607.01104) is released on arXiv.
+- _2026.04_: 🎉🎉 [REST](https://arXiv.org/abs/2507.10541) is accepted by ACL 2026 (Main). Congrats to Zhuoshi Pan!
+- _2025.12_: 🔥🔥 The [technical report](https://arXiv.org/abs/2512.14051) of [OpenDataArena](https://opendataarena.github.io/) is on arXiv.
+- _2025.09_: 🔥🔥 [ScaleDiff](https://arXiv.org/abs/2509.21070) is released on arXiv.
 
 # 📝 Publications
 
 ## ✋ (Co) First-authored Publications
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">arXiv 2026</div><img src='images/CausalMix.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">NeurIPS 2026</div><img src='images/CausalMix.png' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [CausalMix: Data Mixture as Causal Inference for Language Model Training](https://arxiv.org/abs/2607.01104) \\
 **Zinan Tang**, **Yukun Zhang**, Shaomian Zheng, Zhuoshi Pan, Qizhi Pei, Dingnan Jin, Jun Zhou, Yujun Wang, Biqing Huang
+
 </div>
 </div>
 
@@ -48,6 +49,7 @@ His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT
 **Zinan Tang**, Xin Gao, Zhuoshi Pan, Qizhi Pei, Mengzhang Cai, Jiang Wu, Conghui He, Lijun Wu
 
 [**Project**](https://github.com/Word2VecT/Middo) \| [![](https://img.shields.io/github/stars/Word2VecT/Middo?style=social&label=Code+Stars)](https://github.com/Word2VecT/Middo) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/middo-68c27d3b42f79febf7f6312c)
+
 </div>
 </div>
 
@@ -56,6 +58,7 @@ His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT
 
 MTRBench: A Multimodal Reasoning Benchmark from Reality Shows (fka. [Big Escape Benchmark: Evaluating Human-Like Reasoning in Language Models via Real-World Escape Room Challenges](https://aclanthology.org/2025.gem-1.42)) \\
 **Zinan Tang**, **QiYao Sun**, Zhuoshi Pan, Qizhi Pei, Xin Gao, Mengyuan Sun, Honglin Lin, Mengzhang Cai, Yu Li, Chenlin Ming, Jiang Wu, Conghui He, Lijun Wu
+
 </div>
 </div>
 
@@ -68,6 +71,7 @@ MTRBench: A Multimodal Reasoning Benchmark from Reality Shows (fka. [Big Escape 
 Mengzhang Cai, Xin Gao, Yu Li, Honglin Lin, Zheng Liu, Zhuoshi Pan, Qizhi Pei, Xiaoran Shang, Mengyuan Sun, **Zinan Tang**, Xiaoyang Wang, Zhanping Zhong, Yun Zhu, Dahua Lin, Conghui He, Lijun Wu
 
 [**Project**](https://opendataarena.github.io) \| [![](https://img.shields.io/github/stars/OpenDataArena/OpenDataArena-Tool?style=social&label=Code+Stars)](https://github.com/OpenDataArena/OpenDataArena-Tool) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/OpenDataArena)
+
 </div>
 </div>
 
@@ -80,6 +84,7 @@ Mengzhang Cai, Xin Gao, Yu Li, Honglin Lin, Zheng Liu, Zhuoshi Pan, Qizhi Pei, X
 Zhuoshi Pan, Qizhi Pei, Yu Li, **Zinan Tang**, Qiyao Sun, H. Vicky Zhao, Conghui He, Lijun Wu
 
 [**Project**](https://github.com/opendatalab/REST) \| [![](https://img.shields.io/github/stars/opendatalab/REST?style=social&label=Code+Stars)](https://github.com/opendatalab/REST)
+
 </div>
 </div>
 
@@ -90,6 +95,7 @@ Zhuoshi Pan, Qizhi Pei, Yu Li, **Zinan Tang**, Qiyao Sun, H. Vicky Zhao, Conghui
 Qizhi Pei, Zhuoshi Pan, Honglin Lin, Xin Gao, Yu Li, **Zinan Tang**, Conghui He, Rui Yan, Lijun Wu
 
 [**Project**](https://github.com/QizhiPei/ScaleDiff) \| [![](https://img.shields.io/github/stars/QizhiPei/ScaleDiff?style=social&label=Code+Stars)](https://arXiv.org/abs/2509.21070) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/QizhiPei/scalediff-68a71cc18839c1cc1471187e)
+
 </div>
 </div>
 
@@ -100,6 +106,7 @@ Qizhi Pei, Zhuoshi Pan, Honglin Lin, Xin Gao, Yu Li, **Zinan Tang**, Conghui He,
 Xin Gao, Qizhi Pei, **Zinan Tang**, Yu Li, Honglin Lin, Jiang Wu, Lijun Wu, Conghui He
 
 [**Project**](https://github.com/GX-XinGao/GRA) \| [![](https://img.shields.io/github/stars/GX-XinGao/GRA?style=social&label=Code+Stars)](https://github.com/GX-XinGao/GRA) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/GX-XinGao/gra-6801cba58ceb0074566cdb4e)
+
 </div>
 </div>
 
@@ -110,19 +117,20 @@ Xin Gao, Qizhi Pei, **Zinan Tang**, Yu Li, Honglin Lin, Jiang Wu, Lijun Wu, Cong
 Zhuoshi Pan, Yu Li, Honglin Lin, Qizhi Pei, **Zinan Tang**, Wei Wu, Chenlin Ming, H. Vicky Zhao, Conghui He, Lijun Wu
 
 [**Project**](https://github.com/pzs19/LEMMA) \| [![](https://img.shields.io/github/stars/pzs19/LEMMA?style=social&label=Code+Stars)](https://github.com/pzs19/LEMMA) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/panzs19/lemma-68620ced6bedc62fff843e43)
+
 </div>
 </div>
 
 # 🎖 Honors and Awards
 
-- *2025*, National Scholarship, Ministry of Education, PRC
-- *2024*, Second Prize Scholarship, BUPT
-- *2023*, National Scholarship, Ministry of Education, PRC
+- _2025_, National Scholarship, Ministry of Education, PRC
+- _2024_, Second Prize Scholarship, BUPT
+- _2023_, National Scholarship, Ministry of Education, PRC
 
 # 📖 Educations
 
-- *2026.09 - 2028.06* (Expected), master's student in DA, THU, major in EIE.
-- *2022.09 - 2026.06*, undergraduate student in SCS, BUPT, major in CS.
+- _2026.09 - 2028.06_ (Expected), master's student in DA, THU, major in EIE.
+- _2022.09 - 2026.06_, undergraduate student in SCS, BUPT, major in CS.
 
 <!-- # 💬 Invited Talks
 - *2021.06*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet.
@@ -130,10 +138,10 @@ Zhuoshi Pan, Yu Li, Honglin Lin, Qizhi Pei, **Zinan Tang**, Wei Wu, Chenlin Ming
 
 # 💻 Internships
 
-- *2025.12 - present*, [Ant Group]((https://www.antgroup.com)), [Ant Ling AI Model Family](https://www.ant-ling.com), Data Optimization, Beijing, China
-- *2024.09 - 2025.10*, [Shanghai Artificial Intelligent Laboratory](https://www.shlab.org.cn/), [OpenDataLab](https://opendatalab.org.cn/), RAISE, Beijing, China
-- *2024.07 - 2024.08*, [University of Science and Technology of China (USTC)](https://en.ustc.edu.cn/), [State Key Laboratory of Cognitive Intelligence](https://cogskl.iflytek.com/), [COGAI](https://cogai.bdaa.pro/), Hefei, Anhui, China.
-- *2023.07 - 2024.06*, [BUPT](https://www.bupt.edu.cn/), [Department of Intelligent Science and Technology](https://ai.bupt.edu.cn/info/1053/2025.htm), Beijing, China.
+- _2025.12 - present_, [Ant Group](<(https://www.antgroup.com)>), [Ant Ling AI Model Family](https://www.ant-ling.com), Data Optimization, Beijing, China
+- _2024.09 - 2025.10_, [Shanghai Artificial Intelligent Laboratory](https://www.shlab.org.cn/), [OpenDataLab](https://opendatalab.org.cn/), RAISE, Beijing, China
+- _2024.07 - 2024.08_, [University of Science and Technology of China (USTC)](https://en.ustc.edu.cn/), [State Key Laboratory of Cognitive Intelligence](https://cogskl.iflytek.com/), [COGAI](https://cogai.bdaa.pro/), Hefei, Anhui, China.
+- _2023.07 - 2024.06_, [BUPT](https://www.bupt.edu.cn/), [Department of Intelligent Science and Technology](https://ai.bupt.edu.cn/info/1053/2025.htm), Beijing, China.
 
 # 💬 Academic Service
 
