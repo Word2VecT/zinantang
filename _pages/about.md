@@ -23,52 +23,65 @@ His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT
 
 # 🔥 News
 
+- _2026.10_: 🔥🔥 [CoTranslator](https://arxiv.org/abs/2610.20828) is released on arXiv.
 - _2026.09_: 🎉🎉 [CausalMix](https://arxiv.org/abs/2607.01104) is accepted by NeurIPS 2026. Thanks for all collaborators!
 - _2026.07_: 🔥🔥 [CausalMix](https://arxiv.org/abs/2607.01104) is released on arXiv.
 - _2026.04_: 🎉🎉 [REST](https://arXiv.org/abs/2507.10541) is accepted by ACL 2026 (Main). Congrats to Zhuoshi Pan!
 - _2025.12_: 🔥🔥 The [technical report](https://arXiv.org/abs/2512.14051) of [OpenDataArena](https://opendataarena.github.io/) is on arXiv.
-- _2025.09_: 🔥🔥 [ScaleDiff](https://arXiv.org/abs/2509.21070) is released on arXiv.
 
 # 📝 Publications
 
 ## ✋ (Co) First-authored Publications
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">NeurIPS 2026</div><img src='images/CausalMix.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">arXiv 2026</div><img src='images/CoTranslator.webp' alt="sym" width="100%"></div></div>
+<div class='paper-box-text' markdown="1">
+
+[CoTranslator: Reverse to Forward Chain-of-Thought Translator for Reasoning Distillation](https://arxiv.org/abs/2610.20828) \\
+**Zinan Tang**, Zhuoshi Pan, Kairui Chen, Ze Yan, Shaomian Zheng, Yukun Zhang, _Gang Wang_, _Biqing Huang_
+
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/cotranslator)
+
+</div>
+</div>
+
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">NeurIPS 2026</div><img src='images/CausalMix.webp' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [CausalMix: Data Mixture as Causal Inference for Language Model Training](https://arxiv.org/abs/2607.01104) \\
-**Zinan Tang**, **Yukun Zhang**, Shaomian Zheng, Zhuoshi Pan, Qizhi Pei, Dingnan Jin, Jun Zhou, Yujun Wang, Biqing Huang
+**Zinan Tang**, **Yukun Zhang**, Shaomian Zheng, Zhuoshi Pan, Qizhi Pei, Dingnan Jin, Qing Cui,_Jun Zhou_, _Yujun Wang_, _Biqing Huang_
+
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/neurips-2026-causalmix)
 
 </div>
 </div>
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">EMNLP 2025 (Main)</div><img src='images/Middo.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">EMNLP 2025 (Main)</div><img src='images/Middo.webp' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [Middo: Model-Informed Dynamic Data Optimization for Enhanced LLM Fine-Tuning via Closed-Loop Learning](https://aclanthology.org/2025.emnlp-main.350) \\
-**Zinan Tang**, Xin Gao, Zhuoshi Pan, Qizhi Pei, Mengzhang Cai, Jiang Wu, Conghui He, Lijun Wu
+**Zinan Tang**, Xin Gao, Zhuoshi Pan, Qizhi Pei, Mengzhang Cai, Jiang Wu, _Conghui He_, _Lijun Wu_
 
-[**Project**](https://github.com/Word2VecT/Middo) \| [![](https://img.shields.io/github/stars/Word2VecT/Middo?style=social&label=Code+Stars)](https://github.com/Word2VecT/Middo) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/middo-68c27d3b42f79febf7f6312c)
+[**Project**](https://github.com/Word2VecT/Middo) \| [![](https://img.shields.io/github/stars/Word2VecT/Middo?style=social&label=Code+Stars)](https://github.com/Word2VecT/Middo) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/emnlp-2025-main-middo)
 
 </div>
 </div>
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ACL 2025 (Workshop GEM$^2$)</div><img src='images/MTRBanch.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ACL 2025 (Workshop GEM$^2$)</div><img src='images/MTRBanch.webp' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 MTRBench: A Multimodal Reasoning Benchmark from Reality Shows (fka. [Big Escape Benchmark: Evaluating Human-Like Reasoning in Language Models via Real-World Escape Room Challenges](https://aclanthology.org/2025.gem-1.42)) \\
-**Zinan Tang**, **QiYao Sun**, Zhuoshi Pan, Qizhi Pei, Xin Gao, Mengyuan Sun, Honglin Lin, Mengzhang Cai, Yu Li, Chenlin Ming, Jiang Wu, Conghui He, Lijun Wu
+**Zinan Tang**, **QiYao Sun**, Zhuoshi Pan, Qizhi Pei, Xin Gao, Mengyuan Sun, Honglin Lin, Mengzhang Cai, Yu Li, Chenlin Ming, Jiang Wu, _Conghui He_, _Lijun Wu_
 
 </div>
 </div>
 
 ## 📰 Technical Reports
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">arXiv 2025</div><img src='images/ODA.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">arXiv 2025</div><img src='images/ODA.webp' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [OpenDataArena: A Fair and Open Arena for Benchmarking Post-Training Dataset Value](https://arXiv.org/abs/2512.14051) \\
-Mengzhang Cai, Xin Gao, Yu Li, Honglin Lin, Zheng Liu, Zhuoshi Pan, Qizhi Pei, Xiaoran Shang, Mengyuan Sun, **Zinan Tang**, Xiaoyang Wang, Zhanping Zhong, Yun Zhu, Dahua Lin, Conghui He, Lijun Wu
+Mengzhang Cai, Xin Gao, Yu Li, Honglin Lin, Zheng Liu, Zhuoshi Pan, Qizhi Pei, Xiaoran Shang, Mengyuan Sun, **Zinan Tang**, Xiaoyang Wang, Zhanping Zhong, Yun Zhu, Dahua Lin, Conghui He, _Lijun Wu_
 
 [**Project**](https://opendataarena.github.io) \| [![](https://img.shields.io/github/stars/OpenDataArena/OpenDataArena-Tool?style=social&label=Code+Stars)](https://github.com/OpenDataArena/OpenDataArena-Tool) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/OpenDataArena)
 
@@ -77,59 +90,59 @@ Mengzhang Cai, Xin Gao, Yu Li, Honglin Lin, Zheng Liu, Zhuoshi Pan, Qizhi Pei, X
 
 ## 🤝 Co-authored Publications
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ACL 2026 (Main)</div><img src='images/RESTv2.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ACL 2026 (Main)</div><img src='images/RESTv2.webp' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [REST: Stress Testing Large Reasoning Models by Asking Multiple Problems at Once](https://arXiv.org/abs/2507.10541) \\
-Zhuoshi Pan, Qizhi Pei, Yu Li, **Zinan Tang**, Qiyao Sun, H. Vicky Zhao, Conghui He, Lijun Wu
+Zhuoshi Pan, Qizhi Pei, Yu Li, **Zinan Tang**, Qiyao Sun, _H. Vicky Zhao_, _Conghui He_, _Lijun Wu_
 
 [**Project**](https://github.com/opendatalab/REST) \| [![](https://img.shields.io/github/stars/opendatalab/REST?style=social&label=Code+Stars)](https://github.com/opendatalab/REST)
 
 </div>
 </div>
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">arXiv 2025</div><img src='images/scalediff.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">arXiv 2025</div><img src='images/scalediff.webp' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [ScaleDiff: Scaling Difficult Problems for Advanced Mathematical Reasoning](https://arXiv.org/abs/2509.21070) \\
-Qizhi Pei, Zhuoshi Pan, Honglin Lin, Xin Gao, Yu Li, **Zinan Tang**, Conghui He, Rui Yan, Lijun Wu
+Qizhi Pei, Zhuoshi Pan, Honglin Lin, Xin Gao, Yu Li, **Zinan Tang**, _Conghui He_, _Rui Yan_, _Lijun Wu_
 
-[**Project**](https://github.com/QizhiPei/ScaleDiff) \| [![](https://img.shields.io/github/stars/QizhiPei/ScaleDiff?style=social&label=Code+Stars)](https://arXiv.org/abs/2509.21070) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/QizhiPei/scalediff-68a71cc18839c1cc1471187e)
+[**Project**](https://github.com/QizhiPei/ScaleDiff) \| [![](https://img.shields.io/github/stars/QizhiPei/ScaleDiff?style=social&label=Code+Stars)](https://arXiv.org/abs/2509.21070) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/QizhiPei/scalediff)
 
 </div>
 </div>
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ACL 2025 (Main)</div><img src='images/gra.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ACL 2025 (Main)</div><img src='images/gra.webp' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [David's Slingshot: A Strategic Coordination Framework of Small LLMs Matches Large LLMs in Data Synthesis](https://arXiv.org/abs/2504.12322) \\
-Xin Gao, Qizhi Pei, **Zinan Tang**, Yu Li, Honglin Lin, Jiang Wu, Lijun Wu, Conghui He
+Xin Gao, Qizhi Pei, **Zinan Tang**, Yu Li, Honglin Lin, Jiang Wu, Lijun Wu, _Conghui He_
 
-[**Project**](https://github.com/GX-XinGao/GRA) \| [![](https://img.shields.io/github/stars/GX-XinGao/GRA?style=social&label=Code+Stars)](https://github.com/GX-XinGao/GRA) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/GX-XinGao/gra-6801cba58ceb0074566cdb4e)
+[**Project**](https://github.com/GX-XinGao/GRA) \| [![](https://img.shields.io/github/stars/GX-XinGao/GRA?style=social&label=Code+Stars)](https://github.com/GX-XinGao/GRA) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/GX-XinGao/gra)
 
 </div>
 </div>
 
-<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ACL 2025 (Findings)</div><img src='images/lemma.png' alt="sym" width="100%"></div></div>
+<div class='paper-box'><div class='paper-box-image'><div><div class="badge">ACL 2025 (Findings)</div><img src='images/lemma.webp' alt="sym" width="100%"></div></div>
 <div class='paper-box-text' markdown="1">
 
 [LEMMA: Learning from Errors for MatheMatical Advancement in LLMs](https://arXiv.org/abs/2503.17439) \\
-Zhuoshi Pan, Yu Li, Honglin Lin, Qizhi Pei, **Zinan Tang**, Wei Wu, Chenlin Ming, H. Vicky Zhao, Conghui He, Lijun Wu
+Zhuoshi Pan, Yu Li, Honglin Lin, Qizhi Pei, **Zinan Tang**, Wei Wu, Chenlin Ming, H. Vicky Zhao, _Conghui He_, _Lijun Wu_
 
-[**Project**](https://github.com/pzs19/LEMMA) \| [![](https://img.shields.io/github/stars/pzs19/LEMMA?style=social&label=Code+Stars)](https://github.com/pzs19/LEMMA) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/panzs19/lemma-68620ced6bedc62fff843e43)
+[**Project**](https://github.com/pzs19/LEMMA) \| [![](https://img.shields.io/github/stars/pzs19/LEMMA?style=social&label=Code+Stars)](https://github.com/pzs19/LEMMA) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/panzs19/lemma)
 
 </div>
 </div>
 
 # 🎖 Honors and Awards
 
-- _2025_, National Scholarship, Ministry of Education, PRC
-- _2024_, Second Prize Scholarship, BUPT
-- _2023_, National Scholarship, Ministry of Education, PRC
+- _2025_, National Scholarship, Ministry of Education, PRC.
+- _2024_, Second Prize Scholarship, BUPT.
+- _2023_, National Scholarship, Ministry of Education, PRC.
 
 # 📖 Educations
 
-- _2026.09 - 2028.06_ (Expected), master's student in DA, THU, major in EIE.
+- _2026.09 - 2028.06_ (Expected), master's student in DA, THU, major in AI.
 - _2022.09 - 2026.06_, undergraduate student in SCS, BUPT, major in CS.
 
 <!-- # 💬 Invited Talks
@@ -146,6 +159,7 @@ Zhuoshi Pan, Yu Li, Honglin Lin, Qizhi Pei, **Zinan Tang**, Wei Wu, Chenlin Ming
 # 💬 Academic Service
 
 - Reviewer: NeurIPS 2026
+- Secondary reviewer: ARR October 2026
 
 # 🔗 Link Exchange
 
