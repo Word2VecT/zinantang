@@ -27,7 +27,7 @@ His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT
 - _2026.09_: 🎉🎉 [CausalMix](https://arxiv.org/abs/2607.01104) is accepted by NeurIPS 2026. Thanks for all collaborators!
 - _2026.07_: 🔥🔥 [CausalMix](https://arxiv.org/abs/2607.01104) is released on arXiv.
 - _2026.04_: 🎉🎉 [REST](https://arXiv.org/abs/2507.10541) is accepted by ACL 2026 (Main). Congrats to Zhuoshi Pan!
-- _2025.12_: 🔥🔥 The [technical report](https://arXiv.org/abs/2512.14051) of [OpenDataArena](https://opendataarena.github.io/) is on arXiv.
+- _2025.12_: 🔥🔥 The [technical report](https://arXiv.org/abs/2512.14051) of [OpenDataArena](https://opendataarena.github.io/) is released on arXiv.
 
 # 📝 Publications
 
