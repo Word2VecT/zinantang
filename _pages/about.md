@@ -50,7 +50,7 @@ His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT
 [CausalMix: Data Mixture as Causal Inference for Language Model Training](https://arxiv.org/abs/2607.01104) \\
 **Zinan Tang**, **Yukun Zhang**, Shaomian Zheng, Zhuoshi Pan, Qizhi Pei, Dingnan Jin, Qing Cui,_Jun Zhou_, _Yujun Wang_, _Biqing Huang_
 
-[**Project**](https://zinantang.pages.dev/causalmix/) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/neurips-2026-causalmix)
+[**Project**](https://zinantang.pages.dev/causalmix) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/neurips-2026-causalmix)
 
 </div>
 </div>
@@ -96,7 +96,7 @@ Mengzhang Cai, Xin Gao, Yu Li, Honglin Lin, Zheng Liu, Zhuoshi Pan, Qizhi Pei, X
 [REST: Stress Testing Large Reasoning Models by Asking Multiple Problems at Once](https://arXiv.org/abs/2507.10541) \\
 Zhuoshi Pan, Qizhi Pei, Yu Li, **Zinan Tang**, Qiyao Sun, _H. Vicky Zhao_, _Conghui He_, _Lijun Wu_
 
-[**Project**](https://github.com/opendatalab/REST) \| [![](https://img.shields.io/github/stars/opendatalab/REST?style=social&label=Code+Stars)](https://github.com/opendatalab/REST)
+[**Project**](https://opendatalab.github.io/REST) \| [![](https://img.shields.io/github/stars/opendatalab/REST?style=social&label=Code+Stars)](https://github.com/opendatalab/REST)
 
 </div>
 </div>
@@ -158,9 +158,9 @@ Zhuoshi Pan, Yu Li, Honglin Lin, Qizhi Pei, **Zinan Tang**, Wei Wu, Chenlin Ming
 
 # 💬 Academic Service
 
-- Reviewer: NeurIPS 2026
-- Secondary reviewer: ARR October 2026
+- Reviewer: NeurIPS 2026.
+- Secondary reviewer: ARR October 2026.
 
 # 🔗 Link Exchange
 
-[Qizhi Pei](https://qizhipei.github.io)、[Zhuoshi Pan](https://pzs19.github.io)
+[Qizhi Pei](https://qizhipei.github.io)、[Zhuoshi Pan](https://pzs19.github.io).
