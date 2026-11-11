@@ -50,7 +50,7 @@ His research interests are on **Data-centric LLMs** (e.g., AI4data, data4AI, SFT
 [CausalMix: Data Mixture as Causal Inference for Language Model Training](https://arxiv.org/abs/2607.01104) \\
 **Zinan Tang**, **Yukun Zhang**, Shaomian Zheng, Zhuoshi Pan, Qizhi Pei, Dingnan Jin, Qing Cui,_Jun Zhou_, _Yujun Wang_, _Biqing Huang_
 
-[**Project**](https://zinantang.pages.dev/causalmix/) | [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/neurips-2026-causalmix)
+[**Project**](https://zinantang.pages.dev/causalmix/) \| [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue)](https://huggingface.co/collections/Word2Li/neurips-2026-causalmix)
 
 </div>
 </div>
