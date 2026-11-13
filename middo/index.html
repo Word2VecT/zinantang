@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Middo: Model-Informed Dynamic Data Optimization for Enhanced LLM Fine-Tuning via Closed-Loop Learning</title>
+<meta name="description" content="Middo is a closed-loop data optimization framework for LLM fine-tuning: the model being trained diagnoses its own data with loss patterns, embedding cluster dynamics, and self-alignment scores, and the flagged samples are simplified, extended, or improved rather than discarded. EMNLP 2025 Main.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Zinan Tang">
+<meta property="og:title" content="Middo: Model-Informed Dynamic Data Optimization for Enhanced LLM Fine-Tuning via Closed-Loop Learning">
+<meta property="og:description" content="Data and model co-evolve: the model diagnoses its own SFT data on complexity, diversity, and quality, and an LLM refines what it flags. +7.15 average on LLaMA-3.1-8B at nearly the same data size. EMNLP 2025 Main.">
+<meta property="og:url" content="https://zinantang.pages.dev/middo/">
+<meta property="og:image" content="https://zinantang.pages.dev/middo/figures/card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://zinantang.pages.dev/middo/figures/card.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/images/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script>
+(function(){
+  var K='middo-theme', d=document.documentElement;
+  try{ var t=localStorage.getItem(K); if(t==='dark'||t==='light') d.dataset.theme=t; }catch(e){}
+})();
+</script>
+<style>
+:root{
+ --ground:#F5F5F5;--surface:#F5F5F5;--ink:#171717;--muted:#5C5C5C;--faint:#6B6B6B;--line:#D9D9D9;
+ --ghost:#B9B9B9;--link-line:#8A8A8A;--accent:#C2410C;--tint:rgba(0,0,0,.04);
+ --strong:500;--fig:none;--fig-blend:multiply;color-scheme:light;
+ --serif:"EB Garamond","Iowan Old Style","Times New Roman",serif;
+ --sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+ --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+ --gutter:clamp(20px,3vw,40px);--content:1028px;--column:860px;--measure:800px;
+ --c-b:#2563EB;--c-g:#15803D;--c-o:#C2410C;--c-f:#A21CAF;--c-s:#475569;--wash:9%;
+ --pos:#15803D;--neg:#B91C1C}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --ground:#141414;--surface:#141414;--ink:#F2F2F2;--muted:#B0B0B0;--faint:#808080;--line:#2E2E2E;
+ --ghost:#4D4D4D;--link-line:#6E6E6E;--accent:#E8703F;--tint:rgba(255,255,255,.045);
+ --strong:600;--fig:invert(.9) hue-rotate(180deg);--fig-blend:normal;color-scheme:dark;
+ --c-b:#6EA0F5;--c-g:#4FB57A;--c-o:#E8703F;--c-f:#E07BEE;--c-s:#9AA8BC;--wash:15%;
+ --pos:#4FB57A;--neg:#F87171}}
+:root[data-theme=dark]{
+ --ground:#141414;--surface:#141414;--ink:#F2F2F2;--muted:#B0B0B0;--faint:#808080;--line:#2E2E2E;
+ --ghost:#4D4D4D;--link-line:#6E6E6E;--accent:#E8703F;--tint:rgba(255,255,255,.045);
+ --strong:600;--fig:invert(.9) hue-rotate(180deg);--fig-blend:normal;color-scheme:dark;
+ --c-b:#6EA0F5;--c-g:#4FB57A;--c-o:#E8703F;--c-f:#E07BEE;--c-s:#9AA8BC;--wash:15%;
+ --pos:#4FB57A;--neg:#F87171}
+*,:before,:after{box-sizing:border-box}
+html{scrollbar-gutter:stable;min-width:320px;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:var(--ground);color:var(--ink);font-family:var(--serif);
+ font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body:after{content:"";position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.1;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")}
+::selection{background:var(--ink);color:var(--ground)}
+a{color:inherit;text-underline-offset:4px;text-decoration-color:var(--link-line)}
+a:hover{text-decoration-color:var(--ink)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+
+/* Top bar */
+.top{width:min(calc(var(--content) + 2 * var(--gutter)),100%);min-height:76px;margin:0 auto;
+ padding:0 var(--gutter);display:flex;align-items:center;gap:32px}
+.wordmark{font-family:var(--serif);font-size:19px;font-weight:500;letter-spacing:-.01em;
+ text-transform:lowercase;text-decoration:none;margin-right:auto}
+.nav{font-family:var(--sans);font-size:13px;display:flex;gap:28px;margin-right:72px}
+.nav a{color:var(--muted);text-decoration:none}
+.nav a:hover{color:var(--ink)}
+.theme-btn{position:absolute;top:26px;right:max(var(--gutter),calc((100% - var(--content)) / 2));
+ background:none;border:0;padding:6px 2px;color:var(--muted);cursor:pointer;
+ font:400 12px/1 var(--mono);letter-spacing:.04em}
+.theme-btn:hover{color:var(--ink)}
+
+/* Page grid: rail | content */
+.post-page{width:min(calc(var(--content) + 2 * var(--gutter)),100%);margin:0 auto;
+ padding:clamp(48px,6vw,80px) var(--gutter) clamp(80px,10vw,128px)}
+.post{display:grid;grid-template-columns:minmax(112px,128px) minmax(0,var(--column));gap:36px clamp(28px,3vw,40px);
+ align-items:start}
+
+/* Head */
+.post-head{grid-column:2;grid-row:1;display:grid;gap:14px;padding-bottom:26px;border-bottom:1px solid var(--line)}
+.post-head h1{margin:0;font-size:clamp(30px,3.4vw,42px);font-weight:400;line-height:1.1;
+ letter-spacing:-.02em;text-wrap:balance}
+.post-head h1 .sc{font-variant:small-caps;letter-spacing:.01em}
+.post-credits{font-family:var(--sans);display:grid;grid-template-columns:max-content minmax(0,1fr);
+ gap:6px 16px;align-items:baseline;margin:6px 0 0}
+.post-credits dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.post-credits dd{margin:0;font-size:14px;line-height:1.45;color:var(--ink)}
+.post-credits dd a{text-decoration:none}
+.post-credits dd a:hover{text-decoration:underline}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.links a{font:500 11.5px/1 var(--mono);letter-spacing:.04em;text-decoration:none;color:var(--ink);
+ padding:7px 11px 7px;border:1px solid var(--line);border-radius:999px;transition:border-color .16s,background .16s}
+.links a:hover{border-color:var(--ink);background:var(--tint)}
+
+/* Rail */
+.post-rail{grid-column:1;grid-row:2;position:sticky;top:32px;font-family:var(--sans);font-size:11.5px;
+ line-height:1.4;max-height:calc(100vh - 64px);overflow:auto}
+.post-rail>p{margin:0 0 16px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.post-rail ol{list-style:none;margin:0;padding:0}
+.post-rail>ol{padding-left:16px}
+.post-rail li+li{margin-top:10px}
+.post-rail a{display:block;position:relative;color:var(--muted);text-decoration:none;transition:color .16s ease-out}
+.post-rail a:hover,.post-rail a[aria-current]{color:var(--ink)}
+.post-rail .rail-group>a:before{content:"";position:absolute;top:6px;left:-14px;width:4px;height:4px;
+ border-radius:50%;background:var(--ghost)}
+.post-rail .rail-group.is-open>a:before{background:var(--ink)}
+.rail-subs{display:grid;grid-template-rows:0fr;visibility:hidden;
+ transition:grid-template-rows .3s cubic-bezier(.19,1,.22,1),visibility .3s}
+.rail-group.is-open .rail-subs{grid-template-rows:1fr;visibility:visible}
+.rail-subs>ol{min-height:0;overflow:hidden;padding:0 0 0 10px}
+.post-rail .rail-subs li{margin-top:7px}
+.rail-subs a{color:var(--faint)}
+
+/* Body */
+.post-body{grid-column:2;grid-row:2;min-width:0;font-family:var(--sans);font-size:15.5px;line-height:1.65}
+.post-body>section>*{max-width:var(--measure)}
+.post-body section+section{margin-top:56px}
+.post-body [id]{scroll-margin-top:28px}
+.post-body h2,.post-body h3{font-family:var(--serif);font-size:26px;font-weight:400;line-height:1.2;
+ letter-spacing:-.01em;text-wrap:balance}
+.post-body h2{margin:0 0 14px}
+.post-body h3{margin:44px 0 12px}
+.post-body h2+h3{margin-top:12px}
+.post-body p{margin:0 0 14px;text-wrap:pretty}
+.post-body strong{font-weight:var(--strong);color:var(--ink)}
+.post-body ul,.post-body ol{margin:0 0 16px;padding-left:22px}
+.post-body li{margin:6px 0;padding-left:2px}
+.post-body code{font-family:var(--mono);font-size:.86em;background:var(--tint);padding:1px 4px;border-radius:2px}
+.sc{font-variant:small-caps;letter-spacing:.02em}
+sup.cite{font-size:.7em;line-height:0;vertical-align:super}
+sup.cite a{color:var(--muted);text-decoration:none;padding:0 2px 0 1px}
+sup.cite a:hover{color:var(--ink)}
+.katex{font-size:1.04em}
+
+/* Figures */
+.post-figure{margin:26px 0 30px;padding:0}
+.post-figure .fig-title{font-family:var(--serif);font-size:18px;line-height:1.3;color:var(--ink);margin:0 0 12px}
+.post-figure figcaption{max-width:var(--measure);margin-top:14px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.post-figure figcaption b,.table-foot b{font-weight:var(--strong);color:var(--ink)}
+
+/* Tables */
+.post-table-wrap{margin:22px 0 26px;overflow-x:auto}
+.post-table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:13px;line-height:1.45}
+.post-table th{text-align:left;vertical-align:bottom;padding:0 12px 6px 0;font-size:10px;font-weight:500;
+ line-height:1.3;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--ink)}
+.post-table td{vertical-align:baseline;padding:8px 12px 8px 0;border-bottom:1px solid var(--line)}
+.post-table th:last-child,.post-table td:last-child{padding-right:0}
+.post-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.post-table td:first-child{color:var(--ink);white-space:nowrap}
+.post-table .dim td{color:var(--muted)}
+.post-table tr.ours td{background:color-mix(in srgb,var(--c-o) 6%,transparent)}
+.post-table tr.ours td:first-child{font-weight:var(--strong)}
+.post-table tr.sep td{border-top:1px solid var(--ink)}
+.post-table tr.grp td{padding:14px 0 6px;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line)}
+.post-table td.best{font-weight:600;color:var(--accent)}
+.post-table td.second{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--link-line)}
+.post-table td.hl{color:var(--accent)}
+.post-table td.it{color:var(--muted);font-style:italic}
+.post-table .avg{background:var(--tint)}
+.table-foot{max-width:var(--measure);margin:14px 0 0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+
+/* Segmented control */
+.seg{display:flex;flex-wrap:wrap;gap:0;margin:18px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.04em}
+.seg button{background:none;border:1px solid var(--line);margin-left:-1px;padding:7px 12px;color:var(--muted);
+ font:inherit;cursor:pointer;transition:color .16s,background .16s}
+.seg button:first-child{margin-left:0;border-radius:3px 0 0 3px}
+.seg button:last-child{border-radius:0 3px 3px 0}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed=true]{color:var(--ground);background:var(--ink);border-color:var(--ink);position:relative}
+
+/* Equation, citation */
+.eq,.cite-block{background:var(--tint);margin:18px 0 20px}
+.eq{padding:12px 16px;overflow-x:auto}
+.eq .katex-display{margin:4px 0}
+.cite-block pre{margin:0;padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;
+ color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+.references{margin:0;padding-left:1.6em;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.references li+li{margin-top:8px}
+.references li{overflow-wrap:anywhere}
+.references li:target{color:var(--ink)}
+
+/* Method at a glance */
+.post-body .parts{display:grid;gap:6px;list-style:none;margin:0;padding:0}
+.post-body .parts>li{display:grid;gap:6px;margin:0;padding:13px 18px 14px;border-radius:3px;
+ background:color-mix(in srgb,var(--c) var(--wash),transparent)}
+.p-b{--c:var(--c-b)}.p-o{--c:var(--c-o)}.p-g{--c:var(--c-g)}.p-f{--c:var(--c-f)}.p-s{--c:var(--c-s)}
+.parts .k{justify-self:start;font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.06em;
+ text-transform:uppercase;color:var(--c);text-decoration:none}
+.parts .k:hover{text-decoration:underline}
+.post-body .parts p{margin:0;font-size:14px;line-height:1.55}
+
+/* Key idea / finding */
+.post-body .lesson{margin:0 0 18px;padding:2px 0 3px 16px;border-left:2px solid var(--c);
+ font-family:var(--serif);font-size:21px;line-height:1.35;color:var(--ink);text-wrap:pretty}
+.lesson .k{display:block;margin-bottom:6px;font-family:var(--mono);font-size:12.5px;font-weight:500;
+ letter-spacing:.06em;text-transform:uppercase;color:var(--c)}
+
+/* Before / after explorer */
+.ex{max-width:var(--measure);margin-top:14px}
+.ex-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;margin:0 0 10px;font-family:var(--mono);font-size:11px;
+ letter-spacing:.04em;text-transform:uppercase;color:var(--faint)}
+.ex-meta b{font-weight:500;color:var(--c)}
+.ex-pair{display:grid;grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);align-items:stretch}
+.ex-card{border:1px solid var(--line);border-radius:6px;padding:12px 15px 14px;background:var(--ground);font-size:14px;line-height:1.55}
+.ex-card.after{border-color:color-mix(in srgb,var(--c) 50%,transparent);background:color-mix(in srgb,var(--c) var(--wash),transparent)}
+.ex-card small{display:block;margin-bottom:8px;font:500 10.5px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.ex-card.after small{color:var(--c)}
+.post-body .ex-card p{margin:0}
+.post-body .ex-card ul{margin:6px 0 0;padding-left:18px}
+.post-body .ex-card li{margin:3px 0}
+.ex-hints{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--muted)}
+.ex-hints small{margin-bottom:4px}
+.ex-arrow{align-self:center;text-align:center;font-family:var(--mono);color:var(--faint)}
+.ex mark{background:color-mix(in srgb,var(--c) 24%,transparent);color:inherit;padding:0 2px;border-radius:2px}
+.ex-more{margin-top:10px;font-size:13.5px;color:var(--muted)}
+.ex-more>summary{cursor:pointer;font:500 11px/1.4 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:4px 0}
+.ex-more>summary:hover{color:var(--ink)}
+.ex-more .cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;margin-top:6px}
+.post-body .ex-more ol{margin:4px 0 0;padding-left:20px}
+.post-body .ex-more li{margin:3px 0}
+.ex-more h4{margin:8px 0 0;font:500 10.5px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.ex-more pre{margin:8px 0 0;padding:12px 14px;background:var(--tint);font:12px/1.65 var(--mono);color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* Drawn figures: inline SVG in the page's type and hues, so they follow the theme. */
+.fig svg{display:block;width:100%;height:auto;overflow:visible}
+.fig text{font-family:var(--sans);font-size:11.5px;fill:var(--muted)}
+.fig .t{font-size:13px;font-weight:var(--strong);fill:var(--ink)}
+.fig .k{font-family:var(--mono);font-size:10px;letter-spacing:.06em;fill:var(--muted)}
+.fig .m{font-family:var(--mono);font-size:10.5px;fill:var(--ink)}
+.fig .e{font-size:11px}
+.fig .w{fill:var(--accent)}
+.fig .panel{fill:var(--tint)}
+.fig .card{fill:var(--ground);stroke:var(--line)}
+.fig .h-b{--c:var(--c-b)}.fig .h-o{--c:var(--c-o)}.fig .h-g{--c:var(--c-g)}
+.fig .hue .panel{fill:color-mix(in srgb,var(--c) var(--wash),transparent)}
+.fig .hue .k{fill:var(--c);font-weight:500}
+.fig .hue .card{stroke:color-mix(in srgb,var(--c) 45%,transparent)}
+.fig .edge path,.fig .link{fill:none;stroke:var(--faint);stroke-width:1.25}
+.fig .edge polygon{fill:var(--faint)}
+.fig .edge.w path,.fig .link.w{stroke:var(--accent);stroke-width:1.75}
+.fig .edge.w polygon{fill:var(--accent)}
+.fig .flag{fill:var(--accent);font-size:9.5px}
+.fig .zero{stroke:var(--ghost);stroke-width:1}
+.fig .grid{stroke:var(--line);stroke-width:1}
+.fig .band{fill:var(--tint)}
+.fig .tick{fill:var(--faint);font-size:10px}
+.fig .lab{font-size:12px;fill:var(--muted)}.fig .lab.t{fill:var(--ink)}
+.fig .stem{stroke:var(--ghost);stroke-width:1.5}.fig .stem.c{stroke:var(--c);stroke-width:2}
+.fig .dot{fill:var(--muted)}.fig .dot.w{fill:var(--accent)}
+.fig .odot{fill:var(--ground);stroke:var(--muted);stroke-width:1.5}
+.fig .val{fill:var(--muted);font-size:10px}.fig .val.w{fill:var(--accent);font-weight:600}
+.fig .ln{fill:none;stroke:var(--c);stroke-width:2;stroke-linejoin:round}.fig .ln.thin{stroke-width:1.5}
+.fig .area{fill:color-mix(in srgb,var(--c) 20%,transparent)}
+.fig .pt2{fill:var(--c);stroke:var(--ground);stroke-width:2}
+.fig .cross{stroke:var(--ink);stroke-width:1;stroke-dasharray:2 3;pointer-events:none}
+.fig .hit{fill:transparent}
+.fig .tall{display:none;max-width:360px;margin:0 auto}
+@media (max-width:760px){.fig .wide{display:none}.fig .tall{display:block}}
+/* Figure 1 is drawn 1000 units wide and shown at the 800px column: type is set 1.25x so it reads at the body's sizes. */
+.fig svg.wide text{font-size:14px}
+.fig svg.wide .t{font-size:16px}
+.fig svg.wide .k,.fig svg.wide .m{font-size:12.5px}
+.fig svg.wide .e{font-size:13px}
+.fig svg.wide .flag{font-size:11.5px}
+.chart-scroll{overflow-x:auto;padding-bottom:4px}
+.chart-scroll svg{min-width:600px}
+.tsne{max-width:560px;margin:0 auto}
+.tsne canvas{display:block;width:100%;aspect-ratio:1}
+.post-body .key{display:flex;flex-wrap:wrap;gap:6px 18px;list-style:none;padding:0;margin:12px 0 0;font-size:12.5px;color:var(--muted)}
+.post-body .key li{display:flex;align-items:center;gap:7px;margin:0;padding:0}
+.post-body .key i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.post-body .key i.c{border-radius:50%}
+.post-body .key i.o{border-radius:50%;border:1.5px solid var(--muted)}
+.post-body .key i.ln{width:16px;height:2px;border-radius:1px}
+.tip{position:fixed;left:0;top:0;z-index:60;pointer-events:none;opacity:0;max-width:260px;padding:6px 9px;border-radius:3px;
+ background:var(--ink);color:var(--ground);font:400 11.5px/1.45 var(--mono);transition:opacity .12s}
+.tip.on{opacity:1}
+.tip b{font-weight:600}
+
+/* Fold */
+.fold>summary{list-style:none;cursor:pointer}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary h3:after{content:"";display:inline-block;width:.32em;height:.32em;margin:0 0 .14em .45em;
+ border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(-45deg);
+ transition:transform .16s ease-out}
+.fold[open]>summary h3:after{transform:rotate(45deg)}
+.fold>summary:hover h3:after{border-color:var(--ink)}
+
+.authors a{text-decoration:none}
+.authors a:hover{text-decoration:underline}
+.authors sup{font-size:.7em;line-height:0;margin-left:1px}
+.post-body .authors{margin-bottom:6px}
+.post-body .authors-note{font-size:13.5px;line-height:1.55;color:var(--muted)}
+.copy{float:right;background:none;border:0;color:var(--muted);font:400 11px/1 var(--mono);letter-spacing:.04em;cursor:pointer;padding:8px 10px}
+.copy:hover{color:var(--ink)}
+
+@media (max-width:900px){
+ .nav{margin-right:64px}
+ .post{grid-template-columns:minmax(0,1fr);row-gap:28px}
+ .post-head,.post-body,.post-rail{grid-column:1}
+ .post-rail{grid-row:2;position:static;max-height:none;overflow:visible}
+ .post-body{grid-row:3}
+ .post-rail>ol{columns:2;column-gap:24px;padding-left:0}
+ .post-rail>ol>li{break-inside:avoid}
+ .post-rail .rail-group>a:before{display:none}
+ .rail-subs{display:none}
+ .post-page{padding-top:40px}}
+@media (max-width:640px){.ex-pair{grid-template-columns:minmax(0,1fr)}.ex-arrow{transform:rotate(90deg);padding:6px 0}
+ .ex-more .cols{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.post-body{font-size:15px}.nav{display:none}}
+@media print{body:after,.theme-btn,.post-rail,.tip{display:none}}
+</style>
+</head>
+<body>
+<button type="button" class="theme-btn" aria-live="polite">light</button>
+<header class="top"><a class="wordmark" href="/">Zinan Tang</a>
+<nav class="nav"><a href="/#-publications">Publications</a><a href="/#-news">News</a></nav></header>
+
+<main class="post-page"><div class="post">
+<header class="post-head">
+<h1><span class="sc">Middo</span>: Model-Informed Dynamic Data Optimization for Enhanced LLM Fine-Tuning via Closed-Loop Learning</h1>
+<dl class="post-credits">
+<dt>Venue</dt><dd>EMNLP 2025 (Main)</dd>
+<dt>Authors</dt><dd>
+<a href="https://zinantang.pages.dev/">Zinan Tang</a>, Xin Gao, <a href="https://pzs19.github.io">Zhuoshi Pan</a>, <a href="https://qizhipei.github.io">Qizhi Pei</a>, Mengzhang Cai, Jiang Wu, Conghui He<sup>†</sup>, Lijun Wu<sup>†</sup></dd>
+<dt>Affiliation</dt><dd>OpenDataLab, Shanghai Artificial Intelligence Laboratory</dd>
+</dl>
+<div class="links">
+<a href="https://aclanthology.org/2025.emnlp-main.350/">ACL Anthology ↗</a>
+<a href="https://arxiv.org/abs/2508.21589">arXiv ↗</a>
+<a href="https://aclanthology.org/2025.emnlp-main.350.pdf">PDF ↗</a>
+<a href="https://github.com/Word2VecT/Middo">Code ↗</a>
+<a href="https://huggingface.co/collections/Word2Li/emnlp-2025-main-middo">🤗 Hugging Face ↗</a>
+<a href="#citation">BibTeX</a>
+</div>
+</header>
+
+<div class="post-body">
+
+<section>
+<h2 id="introduction">Introduction</h2>
+<p>Supervised fine-tuning (SFT) is only as good as its data. Two families of methods try to improve that data. <strong>Data selection</strong> filters a pool with heuristics or statistics, such as response length<sup class="cite"><a href="#ref-1">1</a></sup> or Instruction-Following Difficulty<sup class="cite"><a href="#ref-2">2</a></sup>, and keeps the samples that score well. <strong>Data synthesis</strong> asks a stronger LLM to write new samples<sup class="cite"><a href="#ref-3">3</a></sup>. Both are one-off. Selection applies fixed criteria that ignore what the model has already learned, and synthesis often discards the original data and can produce narrow or redundant samples.</p>
+<p>We introduce <strong><span class="sc">Middo</span></strong>, model-informed dynamic data optimization. <span class="sc">Middo</span> puts the dataset and the model in a <strong>closed loop</strong>: the model being fine-tuned diagnoses its own training data, the samples it flags are rewritten rather than dropped, and the refined data trains the next model. The diagnosis uses three signals read from the model. <strong>Loss patterns</strong> find samples that are too complex for it, <strong>embedding cluster dynamics</strong> find sparse regions of its representation space, and <strong>self-alignment scores</strong> find samples it judges to be low quality.</p>
+<p>On Alpaca with LLaMA-3.1-8B, three rounds of <span class="sc">Middo</span> raise the average over eight benchmarks from 32.48 to <strong>39.63 (+7.15)</strong>, while the dataset grows only from 52.0K to 57.6K samples. MATH rises from 4.96 to 12.92 and GPQA from 5.56 to 16.67. The gains hold on Mistral-7B-v0.3 and on stronger seed data (Figure 3).</p>
+
+<figure class="post-figure fig">
+<div id="fig-pipeline" aria-label="The Middo loop: the dataset trains a model for one epoch from the base model; the model's loss patterns, embedding clusters and self-alignment scores flag hard, sparse and low-quality samples; an LLM simplifies, extends or improves them; hard and low-quality samples are replaced and extensions added, giving the dataset for the next iteration."></div>
+<figcaption><b>Figure 1.</b> The <span class="sc">Middo</span> loop. Left: the dataset <i>D<sub>t</sub></i> trains a model θ<sub><i>t</i></sub> for one epoch from the base model. Each hued row is one signal read from θ<sub><i>t</i></sub>: orange, loss patterns for complexity; blue, embedding clusters for diversity; green, self-alignment scores for quality. Each selects samples and an LLM refines them. Orange arrow: the refined samples are written back, replacing hard and low-quality samples and adding extensions, and the loop repeats.</figcaption>
+</figure>
+
+<div class="post-table-wrap"><table class="post-table">
+<thead><tr><th>Setting</th><th class="num">Seed data</th><th class="num"><span class="sc">Middo</span></th><th class="num">Change</th></tr></thead>
+<tbody>
+<tr><td>LLaMA-3.1-8B · Alpaca · Avg</td><td class="num">32.48</td><td class="num"><strong>39.63</strong></td><td class="num hl">+7.15</td></tr>
+<tr><td>Mistral-7B-v0.3 · Alpaca · Avg</td><td class="num">24.97</td><td class="num"><strong>29.72</strong></td><td class="num hl">+4.75</td></tr>
+<tr><td>LLaMA-3.1-8B · Alpaca · MATH</td><td class="num">4.96</td><td class="num"><strong>12.92</strong></td><td class="num hl">+7.96</td></tr>
+<tr><td>Maximum per-sample loss</td><td class="num">12.99</td><td class="num"><strong>3.76</strong></td><td class="num hl">−71%</td></tr>
+</tbody></table>
+<p class="table-foot"><b>Highlights.</b> <span class="sc">Middo</span>’s refined data against the seed data it started from, at nearly the same size. Avg is the mean over MMLU, IFEval, GSM8K, MATH, HumanEval, MBPP, HellaSwag, and GPQA.</p></div>
+</section>
+
+<section>
+<h2 id="method">Method</h2>
+<p><span class="sc">Middo</span> repeats one loop: train a model on the current data, read three signals from it, select the samples each signal flags, refine them with an LLM, and write them back.</p>
+<figure class="post-figure">
+<ol class="parts">
+<li class="p-o"><a class="k" href="#complexity">Loss patterns → complexity</a><p>A sample whose loss stays high before and after training is too complex for the current model. It is simplified step by step and replaces the original.</p></li>
+<li class="p-b"><a class="k" href="#diversity">Embedding clusters → diversity</a><p>A sample far from its nearest neighbors in the model’s embedding space sits in a sparse region. A new sample is written from it and its neighbors, and added to the set.</p></li>
+<li class="p-g"><a class="k" href="#quality">Self-alignment scores → quality</a><p>The model scores each instruction and response for clarity, completeness, and factuality. Low-scoring samples are rewritten and replace the originals.</p></li>
+<li class="p-s"><a class="k" href="#loop">Closed loop</a><p>The refined set trains the next model from the base model. Thresholds are relative to the current distribution of each signal, so selection shrinks as the model improves.</p></li>
+</ol>
+<figcaption><b>Table 1.</b> The method at a glance.</figcaption>
+</figure>
+
+<h3 id="loop">The closed loop</h3>
+<p class="lesson p-s"><b class="k">Key idea 1</b>The model that will learn from the data decides which data needs work.</p>
+<p>Let <span class="m">$\mathcal{D}_t$</span> be the training set at iteration <span class="m">$t$</span>, with <span class="m">$\mathcal{D}_0$</span> the seed set. Each iteration fine-tunes the base model for one epoch on <span class="m">$\mathcal{D}_t$</span>, giving <span class="m">$\theta_t$</span>; training from the base model each time, rather than continuing from <span class="m">$\theta_{t-1}$</span>, avoids overfitting to data the model has already seen<sup class="cite"><a href="#ref-4">4</a></sup>. <span class="m">$\theta_t$</span> then reads every sample, the three selectors return <span class="m">$\mathcal{D}^{\mathrm{hard}}$</span>, <span class="m">$\mathcal{D}^{\mathrm{sparse}}$</span>, and <span class="m">$\mathcal{D}^{\mathrm{low}}$</span>, and an LLM refines each into its primed counterpart:</p>
+<div class="eq">$$\mathcal{D}_{t+1}=\Big(\mathcal{D}_t\setminus\big(\mathcal{D}^{\mathrm{hard}}\cup\mathcal{D}^{\mathrm{low}}\big)\Big)\cup\mathcal{D}^{\mathrm{hard}\prime}\cup\mathcal{D}^{\mathrm{low}\prime}\cup\mathcal{D}^{\mathrm{sparse}\prime}$$</div>
+<p>Hard and low-quality samples are replaced, so they do not change the size of the set. Sparse samples are kept and extended, so the set grows slightly: Alpaca goes from 52,002 to 57,636 samples over three iterations. Each selector cuts at a <strong>dynamic threshold</strong> relative to the current distribution of its signal <span class="m">$s$</span>:</p>
+<div class="eq">$$\tau=\mu_s+m\,\sigma_s$$</div>
+<p>where <span class="m">$\mu_s$</span> and <span class="m">$\sigma_s$</span> are the mean and standard deviation of the signal over <span class="m">$\mathcal{D}_t$</span>, and <span class="m">$m$</span> sets how strict the cut is. With <span class="m">$m$</span> fixed, the flagged set shrinks as the data improves: on Alpaca with LLaMA-3.1-8B, loss patterns flag 1,180 samples in iteration 1, 299 in iteration 2, and 242 in iteration 3.</p>
+
+<h3 id="complexity">Loss patterns: complexity</h3>
+<p class="lesson p-o"><b class="k">Key idea 2</b>A sample the model still cannot fit after training is too hard for it now. Simplify it; do not throw it away.</p>
+<p>For a sample <span class="m">$(X_i,Y_i)$</span>, the SFT loss is the negative log-likelihood of the response given the instruction. <span class="sc">Middo</span> compares it before and after training, <span class="m">$\mathcal{L}_{\mathrm{pre}}$</span> and <span class="m">$\mathcal{L}_{\mathrm{post}}$</span>. Low on both means easy. High on both means the sample stayed hard through training, a mismatch between its complexity and the model’s ability:</p>
+<div class="eq">$$\mathcal{D}^{\mathrm{hard}}=\big\{(X_i,Y_i):\ \mathcal{L}_{\mathrm{pre}}(X_i,Y_i)>\tau_{\mathrm{pre}}\ \wedge\ \mathcal{L}_{\mathrm{post}}(X_i,Y_i)>\tau_{\mathrm{post}}\big\}$$</div>
+<p>For each hard sample, an LLM lists ways to make it easier to learn, plans a rewrite, and simplifies it step by step while keeping what it teaches, in the style of automatic instruction evolving<sup class="cite"><a href="#ref-5">5</a></sup>. The simplified sample replaces the original (Figure 2).</p>
+
+<h3 id="diversity">Embedding cluster dynamics: diversity</h3>
+<p class="lesson p-b"><b class="k">Key idea 3</b>A sample with no close neighbors marks a gap in coverage. Write new data around it.</p>
+<p><span class="sc">Middo</span> embeds each sample with the last hidden layer <span class="m">$\mathcal{H}^{(L)}$</span> of <span class="m">$\theta_t$</span>, mean-pooled over tokens, and finds its <span class="m">$k$</span> nearest neighbors <span class="m">$\mathcal{N}_k(X_i)$</span> by cosine similarity. The diversity score is the mean similarity to those neighbors:</p>
+<div class="eq">$$d(X_i)=\frac{1}{k}\sum_{X_j\in\mathcal{N}_k(X_i)}\cos\big(h(X_i),\,h(X_j)\big)$$</div>
+<p>A low score means the sample lies in a sparse region. Samples below the threshold form <span class="m">$\mathcal{D}^{\mathrm{sparse}}$</span>. For each one, the LLM receives the sample as the core prompt and its neighbors as hints, and writes one new sample. The new samples are added and the originals stay, so the distribution widens. <span class="m">$k=2$</span> works best (<a href="#hyper">Choosing m and k</a>).</p>
+
+<h3 id="quality">Self-alignment scores: quality</h3>
+<p class="lesson p-g"><b class="k">Key idea 4</b>No external judge. The model being trained grades its own data.</p>
+<p>LLM-as-a-judge filters such as AlpaGasus<sup class="cite"><a href="#ref-6">6</a></sup> rely on a strong external model. <span class="sc">Middo</span> asks <span class="m">$\theta_t$</span> itself. It scores the instruction alone, <span class="m">$S^{\mathrm{ins}}_{\pi}(X_i)$</span>, and the instruction with its response, <span class="m">$S^{\mathrm{res}}_{\pi}(X_i,Y_i)$</span>, from 0 to 10 on three AlignBench<sup class="cite"><a href="#ref-7">7</a></sup> dimensions <span class="m">$\pi$</span>: clarity, completeness, and factuality. The quality score averages the six:</p>
+<div class="eq">$$S(X_i,Y_i)=\frac{1}{6}\sum_{\pi}\Big(S^{\mathrm{ins}}_{\pi}(X_i)+S^{\mathrm{res}}_{\pi}(X_i,Y_i)\Big),\qquad \pi\in\{\text{clarity},\ \text{completeness},\ \text{factuality}\}$$</div>
+<p>Samples below the threshold form <span class="m">$\mathcal{D}^{\mathrm{low}}$</span>. The LLM diagnoses why each one is weak, plans a fix, and rewrites it, and the rewrite replaces the original.</p>
+
+<h3 id="examples">What a refinement looks like</h3>
+<figure class="post-figure">
+<div class="seg" role="group" aria-label="Selector" id="seg-ex"></div>
+<div class="ex" id="ex"></div>
+<figcaption><b>Figure 2.</b> One sample per selector, from the paper’s case study. Highlights mark what changed. Open the notes for the refiner’s plan and the prompt template it was given; refinement in the paper uses GPT-4o-mini.</figcaption>
+</figure>
+
+<details class="fold"><summary><h3 id="hyper">Choosing m and k</h3></summary>
+<p>The amount refined per selector is set by <span class="m">$m$</span> in <span class="m">$\tau=\mu+m\sigma$</span>. Loss patterns flag the high tail, so their <span class="m">$m$</span> is positive; diversity and quality flag the low tail, so theirs is negative. A sweep on the first iteration of Alpaca gives the best average when about 15% of samples are selected in total (Table 2). We target 10–20% and, among the settings in that range, use the mildest thresholds.</p>
+<div class="post-table-wrap"><table class="post-table">
+<thead><tr><th>Complexity <i>m</i></th><th>Diversity <i>m</i></th><th>Quality <i>m</i></th><th class="num">Selected</th><th class="num">Share</th><th class="num avg">Avg</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>−1</td><td>−1.5</td><td class="num">15.8K</td><td class="num">30.45%</td><td class="num avg">41.81</td></tr>
+<tr class="ours"><td>0.5</td><td>−1.5</td><td>−1.5</td><td class="num">7.7K</td><td class="num">14.88%</td><td class="num avg best">43.23</td></tr>
+<tr><td>1</td><td>−2</td><td>−1.5</td><td class="num">4.3K</td><td class="num">8.20%</td><td class="num avg second">41.96</td></tr>
+<tr><td>1.5</td><td>−2.5</td><td>−1.5</td><td class="num">2.6K</td><td class="num">5.09%</td><td class="num avg">41.55</td></tr>
+<tr><td>2</td><td>−3</td><td>−4</td><td class="num">1.3K</td><td class="num">2.44%</td><td class="num avg">40.87</td></tr>
+<tr><td>3</td><td>−3.5</td><td>−10</td><td class="num">0.5K</td><td class="num">0.92%</td><td class="num avg">39.64</td></tr>
+<tr><td>4</td><td>−4</td><td>−12</td><td class="num">0.1K</td><td class="num">0.26%</td><td class="num avg">38.69</td></tr>
+</tbody></table>
+<p class="table-foot"><b>Table 2.</b> Threshold multiplier <i>m</i> for each selector against the number of unique samples selected and the average score, Alpaca, first iteration.</p></div>
+<p>The number of neighbors matters too. With <span class="m">$k=2$</span> the average is 35.72, against 33.30 for <span class="m">$k=1$</span> and 32.95 for <span class="m">$k=3$</span>: two neighbors expand the data enough to help generalization without adding noise.</p>
+</details>
+</section>
+
+<section>
+<h2 id="experiments">Experiments</h2>
+<h3 id="setup">Setup</h3>
+<ul>
+<li><strong>Seed data.</strong> Alpaca<sup class="cite"><a href="#ref-8">8</a></sup> (52K); Alpaca-4o-mini, the same instructions with responses regenerated by GPT-4o-mini, so that gains cannot come from 4o-mini outputs alone; and WizardLM<sup class="cite"><a href="#ref-9">9</a></sup> (70K). Each runs three iterations of <span class="sc">Middo</span>.</li>
+<li><strong>Refiner.</strong> GPT-4o-mini through DataDreamer<sup class="cite"><a href="#ref-10">10</a></sup>, with temperature and top-p at 1.0 for diversity. No stronger model is needed.</li>
+<li><strong>Training.</strong> LLaMA-3.1-8B<sup class="cite"><a href="#ref-11">11</a></sup> and Mistral-7B-v0.3<sup class="cite"><a href="#ref-12">12</a></sup> with LLaMA-Factory<sup class="cite"><a href="#ref-13">13</a></sup>, one epoch per iteration from the base model, learning rate <span class="m">$2\times10^{-5}$</span> for LLaMA and <span class="m">$1\times10^{-5}$</span> for Mistral, cosine schedule.</li>
+<li><strong>Evaluation.</strong> OpenCompass<sup class="cite"><a href="#ref-14">14</a></sup> with vLLM<sup class="cite"><a href="#ref-15">15</a></sup>, zero-shot: MMLU and IFEval (general), GSM8K and MATH (math), HumanEval and MBPP (code), HellaSwag and GPQA (reasoning).</li>
+</ul>
+
+<h3 id="main-results">Main results</h3>
+<p class="lesson p-o"><b class="k">Finding 1</b>Every seed set, both models: the refined data beats the data it came from, by up to 7.15 points.</p>
+<p>Figure 3 compares each seed set with its three <span class="sc">Middo</span> iterations. The weakest seed set gains most: Alpaca rises 7.15 points on LLaMA-3.1-8B and 4.75 on Mistral-7B-v0.3. On LLaMA, GSM8K rises by 15.55 and HellaSwag by 11.11; on Mistral, MMLU rises by 11.07, GSM8K by 12.59, and GPQA by 10.60.</p>
+<p>Two controls. <strong>Alpaca-4o-mini</strong> starts from GPT-4o-mini responses, the same model <span class="sc">Middo</span> refines with, and still gains 2.20 points on LLaMA (MMLU +11.87), so the gain is not 4o-mini’s style alone. And <strong>better seed data needs fewer rounds</strong>: on LLaMA, Alpaca peaks at iteration 3, Alpaca-4o-mini at iteration 2, and WizardLM at iteration 1.</p>
+<figure class="post-figure fig">
+<p class="fig-title">Seed data against each <span class="sc">Middo</span> iteration</p>
+<div class="chart-scroll" id="fig-headline"></div>
+<ul class="key" id="key-headline"></ul>
+<figcaption><b>Figure 3.</b> Average over eight benchmarks. Grey: trained on the seed data. Open circles: trained on the data after each <span class="sc">Middo</span> iteration. Orange: the best iteration, with its gain over the seed data at right. Hover a point for its value; Table 3 has the full breakdown.</figcaption>
+</figure>
+<div class="seg" role="group" aria-label="Base model" id="seg-main"></div>
+<div class="post-table-wrap" style="margin-top:12px"><table class="post-table" id="tbl-main"></table>
+<p class="table-foot"><b>Table 3.</b> Results by benchmark. <i>init</i> trains on the seed data; <i>iter n</i> trains on the data after <i>n</i> rounds of <span class="sc">Middo</span>. Every row is one epoch of SFT from the base model. <span style="color:var(--accent);font-weight:600">Orange</span>: best average for that seed set; underlined: second best.</p></div>
+
+<h3 id="baselines">Against selection and augmentation</h3>
+<p class="lesson p-f"><b class="k">Finding 2</b>Refining beats filtering and beats writing from scratch. The 8.8K refined samples alone score 42.60, above every baseline.</p>
+<p>We compare on Alpaca with LLaMA-3.1-8B against data selection, Alpaca-cleaned<sup class="cite"><a href="#ref-16">16</a></sup>, Superfiltering<sup class="cite"><a href="#ref-17">17</a></sup>, Long<sup class="cite"><a href="#ref-1">1</a></sup>, and AlpaGasus<sup class="cite"><a href="#ref-6">6</a></sup>, and against data augmentation, Alpaca-GPT4<sup class="cite"><a href="#ref-3">3</a></sup>, I-SHEEP<sup class="cite"><a href="#ref-4">4</a></sup>, and WizardLM<sup class="cite"><a href="#ref-9">9</a></sup>. Selection methods train on a subset, so for a like-for-like comparison <strong>MiddOnly</strong> trains only on the samples <span class="sc">Middo</span> produced, without the untouched ones.</p>
+<p><span class="sc">Middo</span> on Alpaca-4o-mini has the best average, 42.96. MiddOnly Alpaca, with 8.8K samples, reaches 42.60, ahead of WizardLM’s 38.96 with 70K: what drives the gain is which samples are rewritten, not how many there are. Full <span class="sc">Middo</span> Alpaca, at 39.63, also beats every baseline.</p>
+<div class="post-table-wrap"><table class="post-table">
+<thead><tr><th>Method</th><th class="num">Size</th><th class="num">MMLU</th><th class="num">IFEval</th><th class="num">GSM8K</th><th class="num">MATH</th><th class="num">HumanEval</th><th class="num">MBPP</th><th class="num">HellaSwag</th><th class="num">GPQA</th><th class="num avg">Avg</th></tr></thead>
+<tbody>
+<tr class="dim"><td>Alpaca</td><td class="num">52.0K</td><td class="num">47.46</td><td class="num">41.09</td><td class="num">35.63</td><td class="num">4.96</td><td class="num">39.63</td><td class="num">37.40</td><td class="num">48.11</td><td class="num">5.56</td><td class="num avg">32.48</td></tr>
+<tr class="grp"><td colspan="11">Data selection</td></tr>
+<tr><td>Alpaca-cleaned</td><td class="num">51.7K</td><td class="num">47.21</td><td class="num">43.92</td><td class="num">43.90</td><td class="num">4.20</td><td class="num">29.27</td><td class="num">43.40</td><td class="num">60.17</td><td class="num">5.56</td><td class="num avg">34.70</td></tr>
+<tr><td>Superfiltering</td><td class="num">7.8K</td><td class="num">39.96</td><td class="num">37.80</td><td class="num">44.50</td><td class="num">5.38</td><td class="num">40.85</td><td class="num">44.00</td><td class="num">42.38</td><td class="num">27.27</td><td class="num avg">35.27</td></tr>
+<tr><td>Superfiltering GPT-4</td><td class="num">7.8K</td><td class="num">37.71</td><td class="num">34.35</td><td class="num">53.68</td><td class="num">11.00</td><td class="num">9.15</td><td class="num">45.60</td><td class="num">57.81</td><td class="num">2.53</td><td class="num avg">31.48</td></tr>
+<tr><td>Long</td><td class="num">1.0K</td><td class="num">25.51</td><td class="num">14.75</td><td class="num">56.33</td><td class="num">16.56</td><td class="num">13.41</td><td class="num">45.60</td><td class="num">25.83</td><td class="num">0.00*</td><td class="num avg">24.75</td></tr>
+<tr><td>AlpaGasus</td><td class="num">9.2K</td><td class="num">33.98</td><td class="num">48.82</td><td class="num">43.82</td><td class="num">6.06</td><td class="num">35.98</td><td class="num">42.40</td><td class="num">44.50</td><td class="num">18.18</td><td class="num avg">34.22</td></tr>
+<tr class="grp"><td colspan="11">Data augmentation</td></tr>
+<tr><td>I-SHEEP</td><td class="num">8.4K</td><td class="num">23.61</td><td class="num">29.61</td><td class="num">43.14</td><td class="num">8.28</td><td class="num">32.32</td><td class="num">32.60</td><td class="num">41.83</td><td class="num">0.00*</td><td class="num avg">26.42</td></tr>
+<tr><td>Alpaca-GPT4</td><td class="num">52.0K</td><td class="num">51.94</td><td class="num">38.68</td><td class="num">50.87</td><td class="num">10.28</td><td class="num">17.07</td><td class="num">43.60</td><td class="num">63.02</td><td class="num">0.51</td><td class="num avg">34.50</td></tr>
+<tr><td>WizardLM</td><td class="num">70.0K</td><td class="num">46.12</td><td class="num">46.14</td><td class="num">53.30</td><td class="num">12.72</td><td class="num">40.24</td><td class="num">48.00</td><td class="num">53.05</td><td class="num">12.12</td><td class="num avg">38.96</td></tr>
+<tr class="grp"><td colspan="11"><span class="sc">Middo</span></td></tr>
+<tr class="ours"><td><span class="sc">Middo</span> Alpaca</td><td class="num">57.6K</td><td class="num">51.32</td><td class="num">43.20</td><td class="num">51.18</td><td class="num">12.92</td><td class="num">39.63</td><td class="num">41.80</td><td class="num">58.78</td><td class="num">16.67</td><td class="num avg">39.63</td></tr>
+<tr class="ours"><td>MiddOnly<sup>†</sup> Alpaca</td><td class="num">8.8K</td><td class="num">43.47</td><td class="num">40.78</td><td class="num">65.20</td><td class="num">15.58</td><td class="num">51.83</td><td class="num">47.60</td><td class="num">58.65</td><td class="num">17.68</td><td class="num avg">42.60</td></tr>
+<tr class="ours"><td><span class="sc">Middo</span> Alpaca-4o-mini</td><td class="num">63.1K</td><td class="num">44.69</td><td class="num">47.96</td><td class="num">57.62</td><td class="num">18.50</td><td class="num">52.44</td><td class="num">45.40</td><td class="num">57.37</td><td class="num">19.70</td><td class="num avg best">42.96</td></tr>
+<tr class="ours"><td>MiddOnly<sup>†</sup> Alpaca-4o-mini</td><td class="num">24.9K</td><td class="num">41.50</td><td class="num">45.66</td><td class="num">60.80</td><td class="num">20.06</td><td class="num">46.34</td><td class="num">48.00</td><td class="num">55.01</td><td class="num">24.75</td><td class="num avg second">42.77</td></tr>
+</tbody></table>
+<p class="table-foot"><b>Table 4.</b> <span class="sc">Middo</span> against data selection and augmentation baselines, LLaMA-3.1-8B. <span style="color:var(--accent);font-weight:600">Orange</span>: best average; underlined: second best. *0.00: the model solved no GPQA problems. <sup>†</sup>MiddOnly trains only on samples produced by <span class="sc">Middo</span>.</p></div>
+
+<h3 id="ablation">Ablation</h3>
+<p>Removing any one selector lowers the average at every iteration. <em>w/o loss</em> drops loss patterns, <em>w/o neighbor</em> drops embedding cluster dynamics, and <em>w/o score</em> drops self-alignment scores. Which loss hurts most changes over the iterations: without self-alignment scores the first iteration falls from 38.25 to 34.67, and by the second and third, dropping embedding clusters costs the most (39.01 to 35.89 in the third). The three signals are complementary: complexity, diversity, and quality each need their own selector.</p>
+<div class="seg" role="group" aria-label="Iteration" id="seg-abl"></div>
+<div class="post-table-wrap" style="margin-top:12px"><table class="post-table" id="tbl-abl"></table>
+<p class="table-foot"><b>Table 5.</b> Ablation on LLaMA-3.1-8B, Alpaca, over the four development benchmarks; Avg averages those four only.</p></div>
+</section>
+
+<section>
+<h2 id="analysis">Analysis</h2>
+<h3 id="data-scale">How much to refine</h3>
+<p class="lesson p-s"><b class="k">Finding 3</b>Refine a slice, not the whole set. Performance peaks with about 15% of samples refined and falls after that.</p>
+<p>We vary the thresholds to change how many samples are selected and record the average score over three iterations. Both models rise and then fall: LLaMA-3.1-8B peaks at 39.62 with about 7.7K samples (14.9% of Alpaca), and Mistral-7B-v0.3 at 30.90 with about 6.9K (13.3%). A moderate amount also leaves room for later iterations, so <span class="sc">Middo</span> selects about 5% per selector in the first iteration and lets the dynamic thresholds shrink the selection after that. The number of iterations behaves the same way: on Alpaca, the average climbs for three iterations and falls in the fourth, to about 36.7.</p>
+<figure class="post-figure fig">
+<p class="fig-title">Average score by number of samples refined</p>
+<div class="chart-scroll" id="fig-scale"></div>
+<figcaption><b>Figure 4.</b> Average score, over three iterations on Alpaca, against the number of samples selected for refinement. Shaded: the 10–20% range used to set the thresholds. Hover a point for its value.</figcaption>
+</figure>
+
+<h3 id="loss-analysis">Complexity: the loss tail is cut</h3>
+<p class="lesson p-o"><b class="k">Finding 4</b>The data moves toward the model. The loss tail is cut, sparse regions fill in, and self-scores rise.</p>
+<p>Figure 5 compares the per-sample loss of the original data with the data after <span class="sc">Middo</span>. The original distribution has a long tail, up to a maximum loss of 12.99. After <span class="sc">Middo</span> the maximum is 3.76, 71.05% lower, and density moves from the tail into the body of the distribution: the samples that were too complex for the model are gone, and the rest is easier for it to fit.</p>
+<figure class="post-figure fig">
+<p class="fig-title">Per-sample loss, before and after</p>
+<div class="chart-scroll" id="fig-loss"></div>
+<ul class="key" id="key-loss"></ul>
+<figcaption><b>Figure 5.</b> Density of per-sample loss, original data against the data after <span class="sc">Middo</span>; the axis stops at 4. Right: the maximum loss in each. Hover the plot to read both densities at a given loss.</figcaption>
+</figure>
+
+<h3 id="tsne-analysis">Diversity: the gaps fill in</h3>
+<p>Figure 6 projects Alpaca with t-SNE<sup class="cite"><a href="#ref-18">18</a></sup>. The samples <span class="sc">Middo</span> adds sit mostly at the edges of clusters and in sparsely populated regions, not on top of existing data. They widen coverage of the model’s representation space rather than duplicating it.</p>
+<figure class="post-figure fig">
+<p class="fig-title">Where the added samples land</p>
+<div class="seg" role="group" aria-label="Points" id="seg-tsne" style="margin:0 0 14px"></div>
+<div class="tsne" id="fig-tsne"></div>
+<ul class="key" id="key-tsne"></ul>
+<figcaption><b>Figure 6.</b> t-SNE of Alpaca, from the LLaMA-3.1-8B run. Blue: the 5,599 samples added by the three diversity steps (1,924 + 1,853 + 1,822). Grey: 11,198 original samples for context. Use the buttons to show each set alone.</figcaption>
+</figure>
+
+<h3 id="score-analysis">Quality: self-scores rise</h3>
+<p>Figure 7 tracks the mean self-alignment score of each dataset across iterations. Alpaca rises from 7.02 to 8.06 and WizardLM from 7.48 to 8.60. Alpaca-4o-mini starts high and stays near 8.0. As low-quality samples are rewritten, the data converges toward what the model itself judges clear, complete, and factual.</p>
+<figure class="post-figure fig">
+<p class="fig-title">Mean self-alignment score by iteration</p>
+<div class="chart-scroll" id="fig-score"></div>
+<figcaption><b>Figure 7.</b> Mean self-alignment score (0–10) of each dataset at each iteration; at right, the final score and its change since iteration 1. Hover a point for its value.</figcaption>
+</figure>
+
+<h3 id="cost">Cost</h3>
+<p>One iteration, selection plus refinement, finishes in under 30 minutes on 8 × A100 GPUs for datasets of 50K–100K samples. Neighbor search runs on CUDA and self-scoring uses batched vLLM inference.</p>
+<div class="post-table-wrap"><table class="post-table">
+<thead><tr><th>Selector</th><th>1 × A100</th><th>8 × A100, data parallel</th></tr></thead>
+<tbody>
+<tr><td>Loss patterns</td><td>≈ 50 min</td><td>≈ 10 min</td></tr>
+<tr><td>Embedding cluster dynamics</td><td>≈ 40 min + neighbor search</td><td>≈ 10 min, CUDA</td></tr>
+<tr><td>Self-alignment scores</td><td>≈ 1 h per metric, 6 metrics</td><td>≈ 10 min, vLLM</td></tr>
+</tbody></table>
+<p class="table-foot"><b>Table 6.</b> Approximate time per iteration for each selector, datasets of 50K–100K samples.</p></div>
+</section>
+
+<section>
+<h2 id="conclusion">Conclusion</h2>
+<p><span class="sc">Middo</span> turns SFT data curation <strong>from a one-off filter into a loop in which data and model improve together</strong>. Three signals read from the model being trained, loss patterns, embedding cluster dynamics, and self-alignment scores, find samples that are too complex, under-covered, or low quality, and an LLM rewrites them instead of discarding them. Across two models and three seed sets, the refined data beats the original at nearly the same size, by up to 7.15 points on average.</p>
+<p><strong>Limitations.</strong> The diagnostics come from the model being trained, so a weak base model gives weak signals. <span class="sc">Middo</span> does not yet use reinforcement learning, the loop adds compute as data grows or updates more often, and biases in the seed data can carry through refinement.</p>
+</section>
+
+<section>
+<h2 id="authors">Authors</h2>
+<p class="authors"><a href="https://zinantang.pages.dev/">Zinan Tang</a>, Xin Gao, <a href="https://pzs19.github.io">Zhuoshi Pan</a>, <a href="https://qizhipei.github.io">Qizhi Pei</a>, Mengzhang Cai, Jiang Wu, Conghui He<sup>†</sup>, Lijun Wu<sup>†</sup></p>
+<p class="authors-note"><sup>†</sup>Corresponding authors. All authors are with OpenDataLab, Shanghai Artificial Intelligence Laboratory. Zinan Tang did this work as an intern at Shanghai Artificial Intelligence Laboratory, which supported it.</p>
+</section>
+
+<section>
+<h2 id="references">References</h2>
+<ol class="references">
+<li id="ref-1">Zhao, Andriushchenko, Croce, Flammarion. Long Is More for Alignment: A Simple but Tough-to-Beat Baseline for Instruction Fine-Tuning. <i>ICML</i>, 2024. <a href="https://arxiv.org/abs/2402.04833">arXiv:2402.04833</a>.</li>
+<li id="ref-2">Li, Zhang, Li, Chen, Chen, Cheng, Wang, Zhou, Xiao. From Quantity to Quality: Boosting LLM Performance with Self-Guided Data Selection for Instruction Tuning. <i>NAACL</i>, 2024. <a href="https://arxiv.org/abs/2308.12032">arXiv:2308.12032</a>.</li>
+<li id="ref-3">Peng, Li, He, Galley, Gao. Instruction Tuning with GPT-4. 2023. <a href="https://arxiv.org/abs/2304.03277">arXiv:2304.03277</a>.</li>
+<li id="ref-4">Liang et al. I-SHEEP: Self-Alignment of LLM from Scratch through an Iterative Self-Enhancement Paradigm. 2024. <a href="https://arxiv.org/abs/2408.08072">arXiv:2408.08072</a>.</li>
+<li id="ref-5">Zeng, Xu, Zhao, Lou, Chen. Automatic Instruction Evolving for Large Language Models. <i>EMNLP</i>, 2024. <a href="https://arxiv.org/abs/2406.00770">arXiv:2406.00770</a>.</li>
+<li id="ref-6">Chen et al. AlpaGasus: Training a Better Alpaca with Fewer Data. <i>ICLR</i>, 2024. <a href="https://openreview.net/forum?id=FdVXgSJhvz">openreview.net</a>.</li>
+<li id="ref-7">Liu et al. AlignBench: Benchmarking Chinese Alignment of Large Language Models. <i>ACL</i>, 2024. <a href="https://arxiv.org/abs/2311.18743">arXiv:2311.18743</a>.</li>
+<li id="ref-8">Taori, Gulrajani, Zhang, Dubois, Li, Guestrin, Liang, Hashimoto. Stanford Alpaca: An Instruction-following LLaMA Model. 2023. <a href="https://github.com/tatsu-lab/stanford_alpaca">github.com/tatsu-lab/stanford_alpaca</a>.</li>
+<li id="ref-9">Xu et al. WizardLM: Empowering Large Pre-Trained Language Models to Follow Complex Instructions. <i>ICLR</i>, 2024. <a href="https://openreview.net/forum?id=CfXh93NDgH">openreview.net</a>.</li>
+<li id="ref-10">Patel, Raffel, Callison-Burch. DataDreamer: A Tool for Synthetic Data Generation and Reproducible LLM Workflows. <i>ACL</i>, 2024. <a href="https://arxiv.org/abs/2402.10379">arXiv:2402.10379</a>.</li>
+<li id="ref-11">Grattafiori et al. The Llama 3 Herd of Models. 2024. <a href="https://arxiv.org/abs/2407.21783">arXiv:2407.21783</a>.</li>
+<li id="ref-12">Jiang et al. Mistral 7B. 2023. <a href="https://arxiv.org/abs/2310.06825">arXiv:2310.06825</a>.</li>
+<li id="ref-13">Zheng, Zhang, Zhang, Ye, Luo. LlamaFactory: Unified Efficient Fine-Tuning of 100+ Language Models. <i>ACL System Demonstrations</i>, 2024. <a href="https://arxiv.org/abs/2403.13372">arXiv:2403.13372</a>.</li>
+<li id="ref-14">OpenCompass Contributors. OpenCompass: A Universal Evaluation Platform for Foundation Models. 2023. <a href="https://github.com/open-compass/opencompass">github.com/open-compass/opencompass</a>.</li>
+<li id="ref-15">Kwon et al. Efficient Memory Management for Large Language Model Serving with PagedAttention. <i>SOSP</i>, 2023. <a href="https://doi.org/10.1145/3600006.3613165">doi:10.1145/3600006.3613165</a>.</li>
+<li id="ref-16">Ruebsamen. AlpacaDataCleaned: Alpaca dataset from Stanford, cleaned and curated. 2023. <a href="https://github.com/gururise/AlpacaDataCleaned">github.com/gururise/AlpacaDataCleaned</a>.</li>
+<li id="ref-17">Li, Zhang, He, Li, Zhao, Wang, Cheng, Zhou. Superfiltering: Weak-to-Strong Data Filtering for Fast Instruction-Tuning. <i>ACL</i>, 2024. <a href="https://arxiv.org/abs/2402.00530">arXiv:2402.00530</a>.</li>
+<li id="ref-18">van der Maaten, Hinton. Visualizing Data using t-SNE. <i>Journal of Machine Learning Research</i>, 9, 2008. <a href="https://jmlr.org/papers/v9/vandermaaten08a.html">jmlr.org</a>.</li>
+</ol>
+</section>
+
+<section>
+<h2 id="citation">Citation</h2>
+<p>Please cite this work as:</p>
+<div class="cite-block"><button class="copy" type="button">copy</button><pre id="bib">@inproceedings{tang-etal-2025-middo,
+  title     = {Middo: Model-Informed Dynamic Data Optimization for Enhanced {LLM} Fine-Tuning via Closed-Loop Learning},
+  author    = {Tang, Zinan and Gao, Xin and Pei, Qizhi and Pan, Zhuoshi and Cai, Mengzhang and Wu, Jiang and He, Conghui and Wu, Lijun},
+  booktitle = {Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing},
+  pages     = {6871--6891},
+  year      = {2025},
+  address   = {Suzhou, China},
+  publisher = {Association for Computational Linguistics},
+  doi       = {10.18653/v1/2025.emnlp-main.350},
+  url       = {https://aclanthology.org/2025.emnlp-main.350/}
+}</pre></div>
+</section>
+</div>
+
+<nav class="post-rail" aria-label="contents"><p>Contents</p><ol>
+<li class="rail-group"><a href="#introduction">Introduction</a></li>
+<li class="rail-group"><a href="#method">Method</a><div class="rail-subs"><ol>
+<li><a href="#loop">Closed loop</a></li><li><a href="#complexity">Complexity</a></li><li><a href="#diversity">Diversity</a></li><li><a href="#quality">Quality</a></li><li><a href="#examples">Examples</a></li><li><a href="#hyper">Choosing m and k</a></li></ol></div></li>
+<li class="rail-group"><a href="#experiments">Experiments</a><div class="rail-subs"><ol>
+<li><a href="#setup">Setup</a></li><li><a href="#main-results">Main results</a></li><li><a href="#baselines">Baselines</a></li><li><a href="#ablation">Ablation</a></li></ol></div></li>
+<li class="rail-group"><a href="#analysis">Analysis</a><div class="rail-subs"><ol>
+<li><a href="#data-scale">How much to refine</a></li><li><a href="#loss-analysis">Loss tail</a></li><li><a href="#tsne-analysis">Coverage</a></li><li><a href="#score-analysis">Self-scores</a></li><li><a href="#cost">Cost</a></li></ol></div></li>
+<li class="rail-group"><a href="#conclusion">Conclusion</a></li>
+<li class="rail-group"><a href="#authors">Authors</a></li>
+<li class="rail-group"><a href="#references">References</a></li>
+<li class="rail-group"><a href="#citation">Citation</a></li>
+</ol></nav>
+</div></main>
+
+<script src="data.js"></script>
+<script src="figs.js"></script>
+<script>
+/* Theme toggle */
+(function(){
+  var K='middo-theme', d=document.documentElement, b=document.querySelector('.theme-btn');
+  var mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');
+  function sys(){ return mq&&mq.matches ? 'dark' : 'light'; }
+  var pick=null; try{ var t=localStorage.getItem(K); if(t==='dark'||t==='light') pick=t; }catch(e){}
+  function show(){ var v=pick||sys(); b.textContent=v; b.setAttribute('aria-label','colour theme: '+v+', click to change');
+    if(pick) d.dataset.theme=pick; else delete d.dataset.theme; document.dispatchEvent(new Event('middo-theme')); }
+  show(); if(mq&&mq.addEventListener) mq.addEventListener('change',show);
+  b.addEventListener('click',function(){ var next=(pick||sys())==='dark'?'light':'dark'; pick=next===sys()?null:next;
+    try{ pick?localStorage.setItem(K,pick):localStorage.removeItem(K);}catch(e){} show(); });
+})();
+
+/* Math */
+document.addEventListener('DOMContentLoaded',function(){
+  function go(){ if(!window.renderMathInElement) return setTimeout(go,60);
+    renderMathInElement(document.querySelector('.post-body'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false}); }
+  go();
+});
+
+function el(t,a,h){var e=document.createElement(t);if(a)for(var k in a)e.setAttribute(k,a[k]);if(h!=null)e.innerHTML=h;return e;}
+function segmented(host,keys,init,on){ keys.forEach(function(k){ var b=el('button',{type:'button','aria-pressed':k===init},k);
+  b.onclick=function(){ [].forEach.call(host.children,function(x){x.setAttribute('aria-pressed',x===b);}); on(k); }; host.appendChild(b); }); on(init); }
+var MD='<span class="sc">Middo</span>';
+
+/* Table 3: main results, grouped by seed data; best and second-best average marked within each group */
+var BENCH=['MMLU','IFEval','GSM8K','MATH','HumanEval','MBPP','HellaSwag','GPQA'];
+var MAIN={
+ 'LLaMA-3.1-8B':{
+  'Alpaca':[[47.46,41.09,35.63,4.96,39.63,37.40,48.11,5.56,32.48],[50.13,45.77,43.67,10.62,40.24,39.20,56.37,13.64,37.45],[41.82,44.63,50.11,12.40,39.63,41.40,59.22,18.18,38.42],[51.32,43.20,51.18,12.92,39.63,41.80,58.78,16.67,39.63]],
+  'Alpaca-4o-mini':[[32.82,44.04,57.09,17.78,51.22,45.20,53.70,24.24,40.76],[41.09,43.47,54.21,17.34,51.22,46.00,59.11,21.72,41.77],[44.69,47.96,57.62,18.50,52.44,45.40,57.37,19.70,42.96],[38.58,48.11,58.68,18.30,46.95,46.80,52.37,28.79,42.32]],
+  'WizardLM':[[46.12,46.14,53.30,12.72,40.24,48.00,53.05,12.12,38.96],[48.39,50.11,54.44,13.80,46.95,45.00,63.54,20.20,42.80],[48.86,49.48,55.12,13.90,48.78,45.20,58.63,18.18,42.29],[47.18,50.79,54.51,11.70,43.29,45.40,62.97,20.20,42.01]]},
+ 'Mistral-7B-v0.3':{
+  'Alpaca':[[27.66,43.22,22.21,3.88,29.27,28.80,44.17,0.51,24.97],[31.31,45.62,29.57,5.82,30.49,33.80,42.73,14.65,29.25],[26.87,49.46,31.69,6.84,31.71,31.00,53.95,5.56,29.64],[38.73,44.01,34.80,6.64,26.22,31.40,44.86,11.11,29.72]],
+  'Alpaca-4o-mini':[[31.56,43.14,44.88,9.64,42.07,37.80,46.25,21.21,34.56],[31.33,47.93,45.19,8.72,37.20,41.32,41.32,19.70,34.09],[28.83,47.92,48.90,11.34,35.37,38.40,42.63,27.27,35.08],[28.96,50.78,48.60,10.10,32.32,39.00,32.95,20.20,32.86]],
+  'WizardLM':[[40.71,50.95,44.96,8.10,35.98,35.60,53.98,9.09,34.92],[41.39,51.18,44.43,9.44,37.80,38.60,59.01,17.17,37.38],[33.87,51.71,47.08,9.26,39.02,38.40,66.18,19.70,38.15],[43.26,49.80,41.09,10.02,41.46,34.60,66.02,22.22,38.56]]}};
+function rank(vals){ var s=vals.slice().sort(function(a,b){return b-a;}); return {best:s[0],second:s[1]}; }
+segmented(document.getElementById('seg-main'),Object.keys(MAIN),'LLaMA-3.1-8B',function(m){
+  var tbl=document.getElementById('tbl-main'); tbl.innerHTML='';
+  var hr=el('tr'); hr.appendChild(el('th',null,'Seed data')); hr.appendChild(el('th',null,'Data'));
+  BENCH.forEach(function(b){ hr.appendChild(el('th',{class:'num'},b)); }); hr.appendChild(el('th',{class:'num avg'},'Avg'));
+  var th=el('thead'); th.appendChild(hr); tbl.appendChild(th);
+  var tb=el('tbody');
+  Object.keys(MAIN[m]).forEach(function(ds,gi){
+    var rows=MAIN[m][ds], r=rank(rows.map(function(x){return x[8];}));
+    rows.forEach(function(v,i){
+      var cls=[]; if(i===0) cls.push('dim'); if(i===0&&gi) cls.push('sep');
+      var tr=el('tr',cls.length?{class:cls.join(' ')}:null);
+      tr.appendChild(el('td',null,i?'':ds)); tr.appendChild(el('td',{class:'it'},i?'iter '+i:'init'));
+      v.forEach(function(x,c){ var k=['num']; if(c===8){ k.push('avg'); if(x===r.best) k.push('best'); else if(x===r.second) k.push('second'); }
+        tr.appendChild(el('td',{class:k.join(' ')},x.toFixed(2))); });
+      tb.appendChild(tr);
+    });
+  });
+  tbl.appendChild(tb);
+});
+
+/* Table 5: ablation */
+var ABL={
+ 'iter 1':[['Full '+MD,45.77,10.62,40.24,56.37,38.25],['w/o loss',42.49,10.11,39.02,59.53,37.79],['w/o neighbor',39.01,10.82,42.07,57.86,37.45],['w/o score',43.48,10.20,36.59,48.40,34.67]],
+ 'iter 2':[['Full '+MD,44.63,12.40,39.63,59.22,38.97],['w/o loss',42.28,9.92,42.68,58.21,38.27],['w/o neighbor',46.75,10.26,34.76,46.66,34.61],['w/o score',44.18,11.76,39.02,51.38,36.58]],
+ 'iter 3':[['Full '+MD,44.24,12.92,39.63,59.25,39.01],['w/o loss',43.18,12.42,36.59,55.30,36.87],['w/o neighbor',40.12,12.46,34.15,56.83,35.89],['w/o score',45.17,7.92,40.85,54.67,37.15]]};
+segmented(document.getElementById('seg-abl'),Object.keys(ABL),'iter 1',function(k){
+  var tbl=document.getElementById('tbl-abl'); tbl.innerHTML='';
+  var hr=el('tr'); ['Variant','IFEval','MATH','HumanEval','HellaSwag','Avg'].forEach(function(h,i){ hr.appendChild(el('th',i?{class:'num'+(i===5?' avg':'')}:null,h)); });
+  var th=el('thead'); th.appendChild(hr); tbl.appendChild(th);
+  var tb=el('tbody'), r=rank(ABL[k].map(function(x){return x[5];}));
+  ABL[k].forEach(function(row,i){ var tr=el('tr',i?null:{class:'ours'});
+    tr.appendChild(el('td',null,i?'<i>'+row[0]+'</i>':row[0]));
+    row.slice(1).forEach(function(x,c){ var kk=['num']; if(c===4){ kk.push('avg'); if(x===r.best) kk.push('best'); else if(x===r.second) kk.push('second'); }
+      tr.appendChild(el('td',{class:kk.join(' ')},x.toFixed(2))); });
+    tb.appendChild(tr); });
+  tbl.appendChild(tb);
+});
+
+/* Figure 2: before / after explorer */
+var EX={
+ 'Complexity':{h:'o',sig:'loss patterns',op:'simplified · replaces the original',
+  before:'<small>Overly hard sample</small><p>Find the mode of the following set of numbers: <mark>23, 16, 22, 19, 24, 21</mark></p>',
+  after:'<small>Easier sample</small><p>Find the number that <mark>appears the most</mark> in this list: <mark>3, 7, 2, 3, 5, 7</mark>. What is that number?</p>',
+  methods:['Simplify the language used in the prompt.','Break down the instructions into simpler steps.','Provide examples to clarify the concept of mode.','Use smaller numbers or more relatable contexts.','Ask the question in a more direct manner.'],
+  plan:['Change complex terminology like “mode” to a more descriptive explanation.','Use a familiar context, like favorite fruits or animals.','Clearly outline the steps needed to find the most common number, potentially using a smaller set.','Offer a simple example to illustrate the mode calculation.','Keep the structure straightforward and direct.'],
+  template:'You are a powerful LLM with the task to simplify the given #Prompt# for weaker open source LLMs (e.g. LLaMA, Qwen). Since the original #Prompt# is hard for them to handle, you need to rewrite it into a simpler version that these weaker LLMs can handle or learn from more easily. Follow the steps below carefully.\n\nStep 1: Read the #Prompt# in detail. Suggest possible methods to make this prompt easier for weaker LLMs to handle or learn from, then list these methods as your #Methods List#.\n\nStep 2: Create a comprehensive plan to simplify the #Prompt# using several methods from your #Methods List#. Present your plan in a clear, step-by-step format.\n\nStep 3: Execute your plan to rewrite the #Prompt# into a simpler, more learnable version. You can change scenarios, contexts, or settings as needed. Your goal is to ensure that weaker LLMs learn from this prompt, rather than just memorizing an answer.\n\nStep 4: Finally, review your rewritten version for any problems. Present only the #Final Rewritten Prompt#, without any additional explanation.\n\nPlease respond strictly in the following format:\n\nStep 1 #Methods List#:\nStep 2 #Plan#:\nStep 3 #Rewritten Prompt#:\nStep 4 #Final Rewritten Prompt#:'},
+ 'Diversity':{h:'b',sig:'embedding cluster dynamics',op:'extended · added alongside the original',
+  before:'<small>Sparse sample (core prompt)</small><p>How did Julius Caesar die?</p><div class="ex-hints"><small>Nearest neighbors, used as hints</small>How long did Shakespeare live?<br>How did the Industrial Revolution change society?</div>',
+  after:'<small>New sample</small><p><mark>What were the key factors that led to the fall of the Roman Empire?</mark></p>',
+  template:'You are a powerful LLM with the task to create brand new prompts for weaker open source LLMs (e.g. LLaMA, Qwen). You need to create a brand new complete prompt for them to learn in order to improve their knowledge and skills. Follow the steps below carefully.\n\nUse #Hint Prompt 1# and #Hint Prompt 2# as guiding examples. Then read the #Core Prompt# in detail. Be inspired to suggest additional new prompts, and ultimately create only one completely original and diverse #New Prompt#.\n\nPlease respond strictly in the following format:\n\n#New Prompt#:'},
+ 'Quality':{h:'g',sig:'self-alignment scores',op:'improved · replaces the original',
+  before:'<small>Low-quality sample</small><p>Given the following input, generate a job description for a product manager.</p><p>Input: <mark>Noinput</mark></p>',
+  after:'<small>High-quality sample</small><p>Please create a detailed job description for a Product Manager position <mark>in a tech company</mark>. The description should include the following sections:</p><ul><li><mark>Job Summary</mark>: A brief overview of the role and its importance within the company.</li><li><mark>Key Responsibilities</mark>: A list of primary duties that the Product Manager will be responsible for, such as managing product development, collaborating with cross-functional teams, and conducting market research.</li><li><mark>Required Qualifications</mark>: Skills and experiences necessary for the role, including knowledge of product management methodologies, strong analytical abilities, and effective communication skills.</li><li><mark>Preferred Attributes</mark>: Any additional qualities that would make a candidate stand out, such as a passion for technology or experience in agile environments.</li></ul>',
+  methods:['Clarify the input requirements to make them more explicit.','Use structured language with clear expectations for the output.','Specify the context in which the job description will be used.','Provide examples of desirable skills and experiences for the product manager role.','Ensure the language is professional and appropriate for a job description.'],
+  plan:['Add a clear request for a job description that outlines key responsibilities and qualifications for a product manager.','Specify the context, such as whether it’s for a tech company, a startup, or a different industry.','Suggest including attributes and skills relevant to the product manager role, such as project management, communication, and analytics.','Format the request to clearly indicate the sections that should be included in the job description (e.g., summary, responsibilities, qualifications).'],
+  template:'You are a powerful LLM with the task to rewrite the given #Prompt# for weaker open source LLMs (e.g., LLaMA, Qwen). Since the original #Prompt# is of poor quality for them to learn, you need to rewrite it into a higher quality version that these weaker models can better learn from. Follow the steps below carefully.\n\nStep 1: Read the #Prompt# in detail. Identify reasons for the poor quality of the #Prompt#. Suggest possible methods to improve the quality of the #Prompt#, then list these methods as your #Methods List#.\n\nStep 2: Create a comprehensive plan to rewrite the #Prompt# using several methods from your #Methods List#. Present your plan in a clear, step-by-step format.\n\nStep 3: Execute your plan to rewrite the #Prompt# into a higher quality version.\n\nStep 4: Finally, review your rewritten version for any problems. Present only the #Final Rewritten Prompt#, without any additional explanation.\n\nPlease respond strictly in the following format:\n\nStep 1 #Methods List#:\nStep 2 #Plan#:\nStep 3 #Rewritten Prompt#:\nStep 4 #Final Rewritten Prompt#:'}};
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+segmented(document.getElementById('seg-ex'),Object.keys(EX),'Complexity',function(k){
+  var x=EX[k],host=document.getElementById('ex'); host.className='ex p-'+x.h; host.innerHTML='';
+  host.appendChild(el('div',{class:'ex-meta'},'<span>Flagged by <b>'+x.sig+'</b></span><span>'+x.op+'</span>'));
+  var pair=el('div',{class:'ex-pair'});
+  pair.appendChild(el('div',{class:'ex-card'},x.before)); pair.appendChild(el('div',{class:'ex-arrow','aria-hidden':'true'},'→'));
+  pair.appendChild(el('div',{class:'ex-card after'},x.after)); host.appendChild(pair);
+  if(x.methods){ var li=function(a){ return '<ol>'+a.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ol>'; };
+    host.appendChild(el('details',{class:'ex-more'},'<summary>Refiner’s notes</summary><div class="cols"><div><h4>Step 1 · Methods list</h4>'+li(x.methods)+'</div><div><h4>Step 2 · Plan</h4>'+li(x.plan)+'</div></div>')); }
+  host.appendChild(el('details',{class:'ex-more'},'<summary>Prompt template</summary><pre>'+esc(x.template)+'</pre>'));
+});
+
+/* Drawn figures */
+MDFigs.pipeline(document.getElementById('fig-pipeline'));
+MDFigs.headline(document.getElementById('fig-headline'));
+MDFigs.key(document.getElementById('key-headline'),[{t:'Seed data',cls:'c',c:'var(--muted)'},{t:MD+' iteration',cls:'o'},{t:'Best '+MD+' iteration',cls:'c',c:'var(--accent)'}]);
+MDFigs.scale(document.getElementById('fig-scale'));
+MDFigs.loss(document.getElementById('fig-loss'));
+MDFigs.key(document.getElementById('key-loss'),[{t:'Original data',c:'color-mix(in srgb,var(--c-s) 45%,transparent)'},{t:'After '+MD,cls:'ln',c:'var(--c-o)'}]);
+MDFigs.tsne(document.getElementById('fig-tsne'));
+MDFigs.key(document.getElementById('key-tsne'),[{t:'Original Alpaca',cls:'c',c:'var(--c-s)'},{t:'Added by '+MD,cls:'c',c:'var(--c-b)'}]);
+var TS={'All points':'all','Original only':'orig','Added only':'added'};
+segmented(document.getElementById('seg-tsne'),Object.keys(TS),'All points',function(k){ MDFigs.tsneShow(TS[k]); });
+MDFigs.score(document.getElementById('fig-score'));
+
+/* Copy BibTeX */
+document.querySelector('.copy').onclick=function(){ var b=this;
+  navigator.clipboard.writeText(document.getElementById('bib').textContent).then(function(){ b.textContent='copied'; setTimeout(function(){b.textContent='copy';},1400); }); };
+
+/* Rail: highlight current section */
+(function(){
+  var rail=document.querySelector('.post-rail'); var links=[].slice.call(rail.querySelectorAll('a'));
+  var heads=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function mark(){ var line=innerHeight*0.28, cur=-1;
+    heads.forEach(function(h,i){ if(h&&h.getBoundingClientRect().top<=line) cur=i; });
+    links.forEach(function(a,i){ if(i===cur) a.setAttribute('aria-current','location'); else a.removeAttribute('aria-current'); });
+    var open=cur>=0?links[cur].closest('.rail-group'):null;
+    [].forEach.call(rail.querySelectorAll('.rail-group'),function(g){ g.classList.toggle('is-open',g===open); }); }
+  addEventListener('scroll',mark,{passive:true}); addEventListener('resize',mark); mark();
+})();
+</script>
+</body>
+</html>
